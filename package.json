@@ -1,0 +1,26 @@
+{
+  "name": "websr",
+  "version": "0.0.1",
+  "description": "A free and open-source Javascript library / SDK for running practical, real-time AI Upscaling of videos and images on the web.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sb2702/websr.git"
+  },
+  "keywords": [
+    "AI",
+    "Upscaling",
+    "Super",
+    "Resolution",
+    "WebGPU"
+  ],
+  "author": "Sam Bhattacharyya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sb2702/websr/issues"
+  },
+  "homepage": "https://github.com/sb2702/websr#readme"
+}
