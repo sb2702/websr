@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "target": "ES5",
-    "module": "ES2015"
+    "target": "ES2015",
+    "module": "ES2015",
+    "types": ["@webgpu/types"]
   }
 }

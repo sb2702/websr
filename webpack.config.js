@@ -21,12 +21,21 @@ module.exports = {
         rules: [
             {
                 test: /\.ts?$/,
-                use: 'ts-loader',
+                use: {
+                    loader: "ts-loader",
+                    options: {
+                        compilerOptions:{
+                            "types": ["@webgpu/types"]
+                        }
+                    }
+                },
                 exclude: /node_modules/,
+
             },
         ],
 
     },
+
     plugins: [
 
         new HtmlWebpackPlugin({
@@ -38,6 +47,9 @@ module.exports = {
         })
 
     ],
+    resolve: {
+        extensions: [".ts", ".tsx", ".js"]
+    },
 
 
 };
