@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 
 module.exports = {
-    entry: [ "./src/main.js"],
+    entry: [ "./src/main.ts"],
     output: {
         library: "WebSR",
         libraryTarget: "umd",
@@ -17,15 +17,15 @@ module.exports = {
         filename: "websr.js"
     },
     module: {
+
         rules: [
             {
-                test: /\.js$/,
+                test: /\.ts?$/,
+                use: 'ts-loader',
                 exclude: /node_modules/,
-                use: {
-                    loader: "babel-loader"
-                },
             },
-        ]
+        ],
+
     },
     plugins: [
 
