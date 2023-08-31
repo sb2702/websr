@@ -27,7 +27,7 @@ export default class WebSRRenderer{
         });
 
         this.device.queue.copyExternalImageToTexture({source: image}, {texture}, [image.width, image.height]);
-        
+
     }
 
 

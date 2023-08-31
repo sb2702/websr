@@ -7,6 +7,7 @@
 </head>
 <body>
 
+<img src="test.png" />
 <canvas id="canvas" width="640" height="360"></canvas>
 <script>
 
@@ -18,7 +19,7 @@
 
     websr.initWebGPU().then(function (loaded) {
 
-        if(!loaded) return console.log("Unable to load WebGPU")
+        if(!loaded) return console.log("Unable to load WebGPU");
 
         console.log("Loaded WebSR");
 

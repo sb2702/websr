@@ -22,8 +22,7 @@ export default class WebSR {
         return await this.context.load();
     }
 
-    async loadImage(image: HTMLImageElement | ImageBitmap){
-        if(image ! instanceof ImageBitmap) image = await createImageBitmap(image);
+    async loadImage(image: ImageBitmap){
         await this.renderer.loadImage(image);
     }
 
