@@ -51,5 +51,14 @@ module.exports = {
         extensions: [".ts", ".tsx", ".js"]
     },
 
+    devServer: {
+        static: {
+            directory: path.join(__dirname, 'demo'),
+        },
+        compress: true,
+        port: 8000,
+    },
+
+    mode: 'development'
 
 };
