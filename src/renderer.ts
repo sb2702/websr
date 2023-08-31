@@ -2,21 +2,23 @@ import WebGPUContext from "./context";
 import NeuralNetwork from "./networks/base_network";
 
 export default class WebSRRenderer{
-    private device: GPUDevice;
+    private context: WebGPUContext;
     private network: NeuralNetwork;
 
 
 
-    constructor(device: GPUDevice, network: NeuralNetwork) {
+    constructor(context: WebGPUContext, network: NeuralNetwork) {
 
-        this.device = device;
+        this.context = context;
         this.network = network;
 
     }
 
     loadImage(image: ImageBitmap){
 
-        const texture = this.device.createTexture({
+        const device  = this.context.device;
+
+        const texture = device.createTexture({
             label: 'Input Image',
             size: [image.width, image.height],
             format: 'rgba8unorm',
@@ -26,7 +28,7 @@ export default class WebSRRenderer{
                 GPUTextureUsage.RENDER_ATTACHMENT,
         });
 
-        this.device.queue.copyExternalImageToTexture({source: image}, {texture}, [image.width, image.height]);
+        device.queue.copyExternalImageToTexture({source: image}, {texture}, [image.width, image.height]);
 
     }
 

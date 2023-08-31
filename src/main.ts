@@ -14,7 +14,7 @@ export default class WebSR {
         this.canvas = canvas;
         this.context = new WebGPUContext(canvas);
         this.network = new NeuralNetwork(this.context);
-        this.renderer = new WebSRRenderer(this.context.device, this.network);
+        this.renderer = new WebSRRenderer(this.context, this.network);
 
     }
 

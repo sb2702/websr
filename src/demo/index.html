@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<img src="test.png" />
+<img id="img" src="test.png" />
 <canvas id="canvas" width="640" height="360"></canvas>
 <script>
 
@@ -17,11 +17,19 @@
 
     console.log("Loading WebSR");
 
-    websr.initWebGPU().then(function (loaded) {
+    websr.initWebGPU().then(async function (loaded) {
 
         if(!loaded) return console.log("Unable to load WebGPU");
 
         console.log("Loaded WebSR");
+
+        const bitmap = await createImageBitmap(document.getElementById('img'));
+
+        console.log("Feeding bitmap into WebSR");
+
+        websr.loadImage(bitmap);
+
+
 
     });
 
