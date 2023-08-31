@@ -14,7 +14,7 @@ export default class WebSR {
         this.canvas = canvas;
         this.context = new WebGPUContext(canvas);
         this.network = new NeuralNetwork(this.context);
-        this.renderer = new WebSRRenderer(this.context, this.network);
+        this.renderer = new WebSRRenderer(this.context.device, this.network);
 
     }
 
@@ -23,7 +23,8 @@ export default class WebSR {
     }
 
     async loadImage(image: HTMLImageElement | ImageBitmap){
-
+        if(image ! instanceof ImageBitmap) image = await createImageBitmap(image);
+        await this.renderer.loadImage(image);
     }
 
     async render(){

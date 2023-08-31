@@ -3,7 +3,7 @@ export default class WebGPUContext {
 
     private canvas: HTMLCanvasElement;
     private adapter: GPUAdapter | null;
-    private device: GPUDevice;
+    public device: GPUDevice;
     private context: GPUCanvasContext;
 
     constructor(canvas: HTMLCanvasElement) {
