@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSR Demo</title>
+    <script src="websr.js" type="application/javascript"></script>
+</head>
+<body>
+
+<canvas id="canvas" width="640" height="360"></canvas>
+<script>
+
+    const canvas = document.getElementById('canvas');
+
+    const websr = new WebSR(canvas);
+
+    console.log("Loading WebSR");
+
+    websr.initWebGPU().then(function (loaded) {
+
+        if(!loaded) return console.log("Unable to load WebGPU")
+
+        console.log("Loaded WebSR");
+
+    });
+
+
+</script>
+
+
+</body>
+</html>
