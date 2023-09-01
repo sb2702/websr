@@ -3,13 +3,14 @@ import Layer from "./base_layer";
 
 class GuassianLayer extends Layer {
 
+    label = "Gaussian"
 
 
     constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
         super(device, inputTexture, outputTexture)
 
         this.shader = device.createShaderModule({
-            label: 'Guassian',
+            label: `${this.label}-shader`,
 
             code: `
             
@@ -46,23 +47,9 @@ class GuassianLayer extends Layer {
 
 
 
-        this.pipeline =  device.createRenderPipeline({
-            label: 'Guassian Blur Pipeline',
-            layout: 'auto',
-            vertex: {
-                module: this.shader,
-                entryPoint: 'vertexMain',
-            },
-            fragment: {
-                module: this.shader,
-                entryPoint: 'fragmentMain',
-                targets: [{ format:  outputTexture.format}],
-            },
-        });
+        this.pipeline = device.createRenderPipeline(this.defaultPipelineConfig());
 
         this.sampler = device.createSampler();
-
-
 
 
         const gaussianBufferValues = new Float32Array([
@@ -102,11 +89,7 @@ class GuassianLayer extends Layer {
         });
 
 
-
         device.queue.writeBuffer(kernelOffsetsBuffer, /*bufferOffset=*/0, kernelOffsetsValue);
-
-
-
 
 
         this.bindGroup = device.createBindGroup({
@@ -121,18 +104,7 @@ class GuassianLayer extends Layer {
         });
 
 
-        this.renderPassDescriptor = {
-            label: 'our basic canvas renderPass',
-            colorAttachments: [
-                {
-                    view:  outputTexture.createView(),
-                    clearValue: [0, 0, 0, 1],
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                },
-            ],
-        };
-
+        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
 
 
     }

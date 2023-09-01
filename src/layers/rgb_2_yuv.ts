@@ -3,6 +3,7 @@ import Layer from "./base_layer";
 
 class RGB2YUV extends Layer {
 
+    label: "RGB2YUV"
 
 
     constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
@@ -12,7 +13,7 @@ class RGB2YUV extends Layer {
         super(device, inputTexture, outputTexture)
 
         this.shader = device.createShaderModule({
-            label: 'RGB2YUV',
+            label: `${this.label}-shader`,
 
             code: `
           
@@ -36,23 +37,8 @@ class RGB2YUV extends Layer {
 
 
 
-        this.pipeline =  device.createRenderPipeline({
-            label: 'RGB 2 YUV Pipeline',
-            layout: 'auto',
-            vertex: {
-                module: this.shader,
-                entryPoint: 'vertexMain',
-            },
-            fragment: {
-                module: this.shader,
-                entryPoint: 'fragmentMain',
-                targets: [{ format:  outputTexture.format}],
-            },
-        });
-
+        this.pipeline = device.createRenderPipeline(this.defaultPipelineConfig());
         this.sampler = device.createSampler();
-
-
 
 
         const rgb2yuv = new Float32Array([
@@ -70,9 +56,6 @@ class RGB2YUV extends Layer {
         device.queue.writeBuffer(rgb2yuvBuffer, /*bufferOffset=*/0, rgb2yuv);
 
 
-
-
-
         this.bindGroup = device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
@@ -83,18 +66,7 @@ class RGB2YUV extends Layer {
             ],
         });
 
-
-        this.renderPassDescriptor = {
-            label: 'our basic canvas renderPass',
-            colorAttachments: [
-                {
-                    view:  outputTexture.createView(),
-                    clearValue: [0, 0, 0, 1],
-                    loadOp: 'clear',
-                    storeOp: 'store',
-                },
-            ],
-        };
+        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
 
 
 

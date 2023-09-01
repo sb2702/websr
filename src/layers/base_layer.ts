@@ -51,6 +51,42 @@ class Layer {
         `
     }
 
+
+
+    defaultPipelineConfig(): GPURenderPipelineDescriptor{
+
+        return {
+            label: `${this.label}-pipeline`,
+            layout: 'auto',
+            vertex: {
+                module: this.shader,
+                entryPoint: 'vertexMain',
+            },
+            fragment: {
+                module: this.shader,
+                entryPoint: 'fragmentMain',
+                targets: [{format: this.outputTexture.format}],
+            },
+        }
+
+    }
+
+    defaultRenderPassDescriptor(): GPURenderPassDescriptor{
+
+        return   {
+            label: `${this.label}-render-pass`,
+            colorAttachments: [
+                {
+                    view:  this.outputTexture.createView(),
+                    clearValue: [0, 0, 0, 1],
+                    loadOp: 'clear',
+                    storeOp: 'store',
+                },
+            ],
+        };
+
+    }
+
     run(){
 
 
