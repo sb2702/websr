@@ -5,7 +5,7 @@ class RGB2YUV extends Layer {
 
 
 
-    constructor(device, inputTexture, outputTexture){
+    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
 
 
 

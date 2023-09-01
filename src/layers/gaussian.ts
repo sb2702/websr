@@ -5,7 +5,7 @@ class GuassianLayer extends Layer {
 
 
 
-    constructor(device, inputTexture, outputTexture){
+    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
         super(device, inputTexture, outputTexture)
 
         this.shader = device.createShaderModule({

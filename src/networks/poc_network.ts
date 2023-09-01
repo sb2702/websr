@@ -6,8 +6,7 @@ import GuassianLayer from "../layers/gaussian";
 
 
 export default class PoCNetwork extends NeuralNetwork{
-    private context: WebGPUContext;
-
+    
     constructor(context: WebGPUContext) {
         super(context);
     }
