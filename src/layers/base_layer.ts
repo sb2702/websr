@@ -10,11 +10,15 @@ class Layer {
     label: string;
     inputTexture: GPUTexture;
     outputTexture: GPUTexture;
+    uniforms: any[];
+    buffers: {};
 
     constructor(device:GPUDevice, inputTexture: GPUTexture, outputTexture:GPUTexture){
         this.device = device;
         this.inputTexture = inputTexture;
         this.outputTexture = outputTexture;
+        this.uniforms =  [];
+        this.buffers = {};
     }
 
 
@@ -52,6 +56,12 @@ class Layer {
     }
 
 
+    createUniform(name, type){
+
+        this.uniforms.push({name, type});
+
+    }
+
 
     defaultPipelineConfig(): GPURenderPipelineDescriptor{
 
@@ -87,22 +97,84 @@ class Layer {
 
     }
 
+    createStandardShader(fragmentShader): GPUShaderModule{
 
-    createBuffer(label: string, value: Float32Array):GPUBuffer  {
+
+        return  this.device.createShaderModule({
+            label: `${this.label}-shader`,
+            code: `
+          
+              ${this.defaultVertexShader()}
+              
+              ${this.fragmentShaderInputs()}
+              
+              ${fragmentShader}
+        `
+        });
+
+
+
+    }
+
+
+    fragmentShaderInputs(){
+
+        const inputs = [
+        '@group(0) @binding(0) var textureSampler: sampler;',
+        '@group(0) @binding(1) var inputTexture: texture_2d<f32>;'
+        ];
+
+        this.uniforms.forEach((uniform,i)=>{
+            inputs.push(
+                `@group(0) @binding(${i+2}) var <uniform> ${uniform.name}: ${uniform.type};`,
+            )
+        });
+
+        return inputs.join('\n');
+
+    }
+
+
+    setUniform(name: string, value: Float32Array)  {
 
         const buffer= this.device.createBuffer({
-            label,
+            label: `layer-${this.label}-buffer-${name}`,
             size: value.byteLength,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
 
-
         this.device.queue.writeBuffer(buffer, /*bufferOffset=*/0, value);
 
-        return  buffer;
+        this.buffers[name] = buffer;
 
 
+    }
+
+
+    defaultBindGroup(){
+
+        const entries: any[]  = [
+            { binding: 0, resource: this.sampler },
+            { binding: 1, resource: this.inputTexture.createView()}
+
+        ];
+
+        this.uniforms.forEach((uniform, i)=>{
+            entries.push(
+                {
+                    binding: i+2,
+                    resource: {
+                        buffer: this.buffers[uniform.name]
+                    }
+                }
+            )
+        });
+
+         return this.device.createBindGroup({
+            layout: this.pipeline.getBindGroupLayout(0),
+            entries
+        });
     }
 
     run(){
