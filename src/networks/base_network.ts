@@ -14,11 +14,13 @@ class NeuralNetwork {
 
 
     model(): Layer[]{
+
+
+
         return [];
     }
 
     feedForward(){
-
 
         this.layers.forEach(layer => {
 

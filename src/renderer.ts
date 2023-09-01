@@ -18,24 +18,14 @@ export default class WebSRRenderer{
 
         const device  = this.context.device;
 
-        const texture = device.createTexture({
-            label: 'Input Image',
-            size: [image.width, image.height],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
-
-        device.queue.copyExternalImageToTexture({source: image}, {texture}, [image.width, image.height]);
+        device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.input}, [image.width, image.height]);
 
     }
 
 
 
     render(){
-
+        this.network.feedForward();
     }
 
 

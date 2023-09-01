@@ -1,9 +1,10 @@
 
 export default class WebGPUContext {
 
-    private canvas: HTMLCanvasElement;
-    public device: GPUDevice;
-    private context: GPUCanvasContext;
+    canvas: HTMLCanvasElement;
+    device: GPUDevice;
+    context: GPUCanvasContext;
+    input: GPUTexture;
 
     constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
 
@@ -17,6 +18,24 @@ export default class WebGPUContext {
             device: this.device,
             format: navigator.gpu.getPreferredCanvasFormat()
         });
+
+
+
+        const inputTexture = device.createTexture({
+            label: 'Input Image',
+            size: [canvas.width, canvas.height],
+            format: 'rgba8unorm',
+            usage:
+                GPUTextureUsage.TEXTURE_BINDING |
+                GPUTextureUsage.COPY_DST |
+                GPUTextureUsage.RENDER_ATTACHMENT,
+        });
+        
+
+
+        this.input = inputTexture;
+        
+        
 
     }
 
