@@ -6,39 +6,18 @@ class RGB2YUV extends Layer {
 
 
     constructor(device, inputTexture, outputTexture){
+
+
+
         super(device, inputTexture, outputTexture)
 
         this.shader = device.createShaderModule({
             label: 'RGB2YUV',
 
             code: `
-            
-             struct VertexShaderOutput {
-                @builtin(position) position: vec4f,
-                @location(0) tex_coord: vec2f,
-              };
+          
+          ${this.defaultVertexShader()}
 
-            @vertex
-            fn vertexMain( @builtin(vertex_index) vertexIndex : u32) ->  VertexShaderOutput{
-                let pos = array(
-                // 1st triangle
-                vec2f( -1.0,  -1.0),  // center
-                vec2f( 1.0,  -1.0),  // right, center
-                vec2f( -1.0,  1.0),  // center, top
-             
-                // 2st triangle
-                vec2f( -1.0,  1.0),  // center, top
-                vec2f( 1.0,  -1.0),  // right, center
-                vec2f( 1.0,  1.0),  // right, top
-              );
-             
-              var vsOutput: VertexShaderOutput;
-              let xy = pos[vertexIndex];
-              vsOutput.position = vec4f(xy, 0.0, 1.0);
-              vsOutput.tex_coord = xy*0.5 + 0.5;
-              return vsOutput;
-            }
-    
           @group(0) @binding(0) var<uniform> rgb2yuv: mat3x3f;
           @group(0) @binding(1) var ourSampler: sampler;
           @group(0) @binding(2) var ourTexture: texture_2d<f32>;
