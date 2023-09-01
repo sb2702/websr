@@ -56,7 +56,7 @@ class GuassianLayer extends Layer {
             fragment: {
                 module: this.shader,
                 entryPoint: 'fragmentMain',
-                targets: [{ format:  navigator.gpu.getPreferredCanvasFormat()}],
+                targets: [{ format:  outputTexture.format}],
             },
         });
 

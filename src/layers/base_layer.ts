@@ -64,7 +64,7 @@ class Layer {
         pass.end();
 
         this.device.queue.submit([encoder.finish()]);
-        
+
 
     }
 
