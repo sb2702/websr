@@ -24,18 +24,18 @@ class GuassianLayer extends Layer {
                         // 1st triangle
                         vec2f( -1.0,  -1.0),  // center
                         vec2f( 1.0,  -1.0),  // right, center
-                        vec2f( -1.0,  1.0),  // center, top
+                        vec2f( 1.0,  1.0),  // center, top
                      
                         // 2st triangle
-                        vec2f( -1.0,  1.0),  // center, top
-                        vec2f( 1.0,  -1.0),  // right, center
-                        vec2f( 1.0,  1.0),  // right, top
+                        vec2f( -1.0,  -1.0),  // center, top
+                        vec2f( 1.0,  1.0),  // right, center
+                        vec2f( -1.0,  1.0),  // right, top
                       );
                      
                       var vsOutput: VertexShaderOutput;
                       let xy = pos[vertexIndex];
                       vsOutput.position = vec4f(xy, 0.0, 1.0);
-                      vsOutput.tex_coord = xy;
+                      vsOutput.tex_coord = xy*0.5 + 0.5;
                       return vsOutput;
                     }
     

@@ -35,7 +35,7 @@ class RGB2YUV extends Layer {
               var vsOutput: VertexShaderOutput;
               let xy = pos[vertexIndex];
               vsOutput.position = vec4f(xy, 0.0, 1.0);
-              vsOutput.tex_coord = xy;
+              vsOutput.tex_coord = xy*0.5 + 0.5;
               return vsOutput;
             }
     
