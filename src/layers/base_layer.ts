@@ -87,6 +87,24 @@ class Layer {
 
     }
 
+
+    createBuffer(label: string, value: Float32Array):GPUBuffer  {
+
+        const buffer= this.device.createBuffer({
+            label,
+            size: value.byteLength,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
+
+
+        this.device.queue.writeBuffer(buffer, /*bufferOffset=*/0, value);
+
+        return  buffer;
+
+
+    }
+
     run(){
 
 

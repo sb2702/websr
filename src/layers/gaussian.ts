@@ -52,51 +52,35 @@ class GuassianLayer extends Layer {
         this.sampler = device.createSampler();
 
 
-        const gaussianBufferValues = new Float32Array([
+        const gaussianKernel= this.createBuffer("Gaussian Kernel",
+            new Float32Array([
             0.0675,  0.125,  0.0675, 0.0,
             0.125,  0.250,  0.1250, 0.0,
             0.0675,  0.125,  0.0675 , 0.0
-        ]);
-
-        const gaussianBuffer= device.createBuffer({
-            label: "Guassian Buffer Kernel",
-            size: gaussianBufferValues.byteLength,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
+            ])
+        );
 
 
-
-        device.queue.writeBuffer(gaussianBuffer, /*bufferOffset=*/0, gaussianBufferValues);
-
-
-        const kernelOffsetsValue = new Float32Array([
-            -1/256, -1/256, 0, 0,
-            0     , -1/256, 0, 0,
-            1/256 , -1/256, 0, 0,
-            -1/256,      0, 0, 0,
-            0     ,      0, 0, 0,
-            1/256 ,      0, 0, 0,
-            -1/256,  1/256, 0, 0,
-            0     ,  1/256, 0, 0,
-            1/256 ,  1/256, 0, 0,
-        ]);
-
-
-        const kernelOffsetsBuffer= device.createBuffer({
-            label: "Guassian Buffer Kernel",
-            size: kernelOffsetsValue.byteLength,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
-
-        device.queue.writeBuffer(kernelOffsetsBuffer, /*bufferOffset=*/0, kernelOffsetsValue);
+        const kernelOffset = this.createBuffer("Kernel Offset",
+            new Float32Array([
+                -1/256, -1/256, 0, 0,
+                0     , -1/256, 0, 0,
+                1/256 , -1/256, 0, 0,
+                -1/256,      0, 0, 0,
+                0     ,      0, 0, 0,
+                1/256 ,      0, 0, 0,
+                -1/256,  1/256, 0, 0,
+                0     ,  1/256, 0, 0,
+                1/256 ,  1/256, 0, 0,
+            ])
+        );
 
 
         this.bindGroup = device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: {buffer: gaussianBuffer} },
-                { binding: 1, resource: {buffer: kernelOffsetsBuffer} },
+                { binding: 0, resource: {buffer: gaussianKernel} },
+                { binding: 1, resource: {buffer: kernelOffset} },
                 { binding: 2, resource: this.sampler },
                 { binding: 3, resource: this.inputTexture.createView() },
 

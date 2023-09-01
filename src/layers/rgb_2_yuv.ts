@@ -9,7 +9,6 @@ class RGB2YUV extends Layer {
     constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
 
 
-
         super(device, inputTexture, outputTexture)
 
         this.shader = device.createShaderModule({
@@ -40,26 +39,20 @@ class RGB2YUV extends Layer {
         this.pipeline = device.createRenderPipeline(this.defaultPipelineConfig());
         this.sampler = device.createSampler();
 
-
-        const rgb2yuv = new Float32Array([
-            0.299, -0.1473, 0.615, 1.0,
-            0.587, -.2886, -.51499, 1.0,
-            0.114,  0.436, -.1001, 1.0
-        ]);
-
-        const rgb2yuvBuffer= device.createBuffer({
-            label: "RGB to YUV Conversion Matrix Buffer",
-            size: rgb2yuv.byteLength,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
-        device.queue.writeBuffer(rgb2yuvBuffer, /*bufferOffset=*/0, rgb2yuv);
+        
+        const rgb2yuv = this.createBuffer("RGB2YUV conversion",
+            new Float32Array([
+                0.299, -0.1473, 0.615, 1.0,
+                0.587, -.2886, -.51499, 1.0,
+                0.114,  0.436, -.1001, 1.0
+            ])
+        );
 
 
         this.bindGroup = device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
-                { binding: 0, resource: {buffer: rgb2yuvBuffer} },
+                { binding: 0, resource: {buffer: rgb2yuv} },
                 { binding: 1, resource: this.sampler },
                 { binding: 2, resource: inputTexture.createView() },
 
