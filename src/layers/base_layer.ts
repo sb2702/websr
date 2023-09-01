@@ -81,6 +81,17 @@ class Layer {
 
     }
 
+    defaultSetup(){
+
+        this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
+
+        this.sampler = this.device.createSampler();
+
+        this.bindGroup = this.defaultBindGroup();
+
+        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
+    }
+
     defaultRenderPassDescriptor(): GPURenderPassDescriptor{
 
         return   {

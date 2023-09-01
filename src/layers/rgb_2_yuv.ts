@@ -33,17 +33,7 @@ class RGB2YUV extends Layer {
 
 
 
-
-        this.pipeline = device.createRenderPipeline(this.defaultPipelineConfig());
-        this.sampler = device.createSampler();
-
-
-
-        this.bindGroup = this.defaultBindGroup();
-
-        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
-
-
+        this.defaultSetup();
 
     }
 
