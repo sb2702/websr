@@ -8,7 +8,7 @@
 <body>
 
 <img id="img" src="test.png" />
-<canvas id="canvas" width="640" height="360"></canvas>
+<canvas id="canvas" width="256" height="256"></canvas>
 <script>
 
     const canvas = document.getElementById('canvas');
@@ -27,6 +27,10 @@
         console.log("Feeding bitmap into WebSR");
 
         websr.loadImage(bitmap);
+
+        console.log("Rendering");
+
+        websr.render();
 
 
     });

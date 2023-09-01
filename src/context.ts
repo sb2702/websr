@@ -5,6 +5,7 @@ export default class WebGPUContext {
     device: GPUDevice;
     context: GPUCanvasContext;
     input: GPUTexture;
+    output: GPUTexture;
 
     constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
 
@@ -34,6 +35,8 @@ export default class WebGPUContext {
 
 
         this.input = inputTexture;
+
+        this.output = this.context.getCurrentTexture();
         
         
 

@@ -3,8 +3,8 @@ import Layer from "../layers/base_layer";
 
 
 class NeuralNetwork {
-    private context: WebGPUContext;
-    private layers: Layer[];
+    context: WebGPUContext;
+    layers: Layer[];
 
     constructor(context: WebGPUContext) {
 
@@ -24,6 +24,7 @@ class NeuralNetwork {
 
         this.layers.forEach(layer => {
 
+            console.log("Running layer");
             layer.run();
 
         });

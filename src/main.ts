@@ -2,6 +2,7 @@
 import WebGPUContext from './context'
 import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
+import PoCNetwork from "./networks/poc_network";
 
 
 export default class WebSR {
@@ -14,7 +15,7 @@ export default class WebSR {
 
         this.canvas = canvas;
         this.context = new WebGPUContext(device, canvas);
-        this.network = new NeuralNetwork(this.context);
+        this.network = new PoCNetwork(this.context);
         this.renderer = new WebSRRenderer(this.context, this.network);
 
     }

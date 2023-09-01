@@ -32,6 +32,7 @@ class Layer {
 
         this.device.queue.submit([encoder.finish()]);
 
+        console.log("Calling layer run");
 
     }
 

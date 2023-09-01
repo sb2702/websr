@@ -2,11 +2,11 @@ import WebGPUContext from "../context";
 import Layer from "../layers/base_layer";
 import NeuralNetwork from "./base_network";
 import RGB2YUV from "../layers/rgb_2_yuv";
+import GuassianLayer from "../layers/gaussian";
 
 
-class PoCNetwork extends NeuralNetwork{
+export default class PoCNetwork extends NeuralNetwork{
     private context: WebGPUContext;
-    private layers: Layer[];
 
     constructor(context: WebGPUContext) {
         super(context);
@@ -29,28 +29,13 @@ class PoCNetwork extends NeuralNetwork{
 
         layers.push(new RGB2YUV(this.context.device, this.context.input, texture1));
 
-
+        layers.push(new GuassianLayer(this.context.device, texture1, this.context.output));
 
         return layers;
 
 
     }
 
-    feedForward(){
-
-
-        this.layers.forEach(layer => {
-
-            layer.run();
-
-        });
-
-
-    }
-
-
 
 }
 
-
-export default NeuralNetwork
