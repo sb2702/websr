@@ -23,10 +23,7 @@ class NeuralNetwork {
     feedForward(){
 
         this.layers.forEach(layer => {
-
-            console.log("Running layer");
             layer.run();
-
         });
 
 
