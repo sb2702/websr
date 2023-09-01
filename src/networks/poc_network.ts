@@ -16,19 +16,11 @@ export default class PoCNetwork extends NeuralNetwork{
 
         const layers:Layer[] = [];
 
-        const texture1 = this.context.device.createTexture({
-            label: 'Input Image',
-            size: [this.context.canvas.width, this.context.canvas.height],
-            format: 'rgba8unorm',
-            usage:
-                GPUTextureUsage.TEXTURE_BINDING |
-                GPUTextureUsage.COPY_DST |
-                GPUTextureUsage.RENDER_ATTACHMENT,
-        });
+        const context = this.context;
 
-        layers.push(new RGB2YUV(this.context.device, this.context.input, texture1));
+        layers.push(new RGB2YUV(context.device, context.input, context.texture('yuv')));
 
-        layers.push(new GuassianLayer(this.context.device, texture1, this.context.output));
+        layers.push(new GuassianLayer(this.context.device, context.texture('yuv'), this.context.output));
 
         return layers;
 
