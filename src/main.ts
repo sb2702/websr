@@ -10,16 +10,28 @@ export default class WebSR {
     private network: NeuralNetwork;
     private renderer: WebSRRenderer;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
+
         this.canvas = canvas;
-        this.context = new WebGPUContext(canvas);
+        this.context = new WebGPUContext(device, canvas);
         this.network = new NeuralNetwork(this.context);
         this.renderer = new WebSRRenderer(this.context, this.network);
 
     }
 
-    async initWebGPU(): Promise<boolean>{
-        return await this.context.load();
+    static async initWebGPU(): Promise<GPUDevice | false>{
+
+        if(!navigator.gpu) return false;
+
+        const adapter = await navigator.gpu.requestAdapter();
+
+        if(!adapter) return false;
+
+        const device = await adapter.requestDevice();
+
+        if(!device) return false;
+
+        return device;
     }
 
     async loadImage(image: ImageBitmap){

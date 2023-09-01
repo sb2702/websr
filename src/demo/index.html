@@ -13,8 +13,20 @@
 
     const canvas = document.getElementById('canvas');
 
-    const websr = new WebSR(canvas);
 
+    WebSR.initWebGPU().then(function (gpu) {
+
+        if(!gpu) return console.log("Unable to load WebGPU");
+
+        const websr = new WebSR(gpu, canvas);
+
+        console.log("Loaded WebSR", websr);
+
+
+    });
+
+
+/*
     console.log("Loading WebSR");
 
     websr.initWebGPU().then(async function (loaded) {
@@ -32,7 +44,7 @@
 
 
     });
-
+*/
 
 </script>
 
