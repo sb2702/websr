@@ -16,7 +16,7 @@ class RGB2YUV extends Layer {
         
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
               
-                    let color = textureSample(inputTexture, textureSampler, input.tex_coord);       
+                    let color = textureLoad(inputTexture, vec2<i32>(input.tex_coord), 0);       
                     let yuv = rgb2yuv*color.xyz;
           
                 return vec4f(yuv, 1.0);

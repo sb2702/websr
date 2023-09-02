@@ -55,6 +55,7 @@ class Layer {
               let xy = pos[vertexIndex];
               vsOutput.position = vec4f(xy, 0.0, 1.0);
               vsOutput.tex_coord = xy*0.5 + 0.5;
+               vsOutput.tex_coord =  vsOutput.tex_coord*256;
               return vsOutput;
             }
         `
@@ -89,8 +90,6 @@ class Layer {
     defaultSetup(){
 
         this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
-
-        this.sampler = this.device.createSampler();
 
         this.bindGroup = this.defaultBindGroup();
 
@@ -136,13 +135,12 @@ class Layer {
     fragmentShaderInputs(){
 
         const inputs = [
-        '@group(0) @binding(0) var textureSampler: sampler;',
-        '@group(0) @binding(1) var inputTexture: texture_2d<f32>;'
+        '@group(0) @binding(0) var inputTexture: texture_2d<f32>;'
         ];
 
         this.uniforms.forEach((uniform,i)=>{
             inputs.push(
-                `@group(0) @binding(${i+2}) var <uniform> ${uniform.name}: ${uniform.type};`,
+                `@group(0) @binding(${i+1}) var <uniform> ${uniform.name}: ${uniform.type};`,
             )
         });
 
@@ -171,15 +169,14 @@ class Layer {
     defaultBindGroup(){
 
         const entries: any[]  = [
-            { binding: 0, resource: this.sampler },
-            { binding: 1, resource: this.inputTexture.createView()}
+            { binding: 0, resource: this.inputTexture.createView()}
 
         ];
 
         this.uniforms.forEach((uniform, i)=>{
             entries.push(
                 {
-                    binding: i+2,
+                    binding: i+1,
                     resource: {
                         buffer: this.buffers[uniform.name]
                     }

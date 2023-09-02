@@ -23,9 +23,9 @@ class GuassianLayer extends Layer {
                      for(var i = 0u; i < 3; i++){
                      
                         let a = vec3f(
-                            textureSample(inputTexture, textureSampler, input.tex_coord + kernel_offsets[i*3].xy).x,
-                            textureSample(inputTexture, textureSampler, input.tex_coord + kernel_offsets[i*3+1].xy).x,
-                            textureSample(inputTexture, textureSampler, input.tex_coord + kernel_offsets[i*3+2].xy).x
+                            textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x,
+                            textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x,
+                            textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x
                         );
                         
                         val += dot(a, gaussian[i]);
@@ -48,15 +48,15 @@ class GuassianLayer extends Layer {
 
 
         this.setUniform("kernel_offsets",  new Float32Array([
-            -1/256, -1/256, 0, 0,
-            0     , -1/256, 0, 0,
-            1/256 , -1/256, 0, 0,
-            -1/256,      0, 0, 0,
+            -1, -1, 0, 0,
+            0     , -1, 0, 0,
+            1 , -1, 0, 0,
+            -1,      0, 0, 0,
             0     ,      0, 0, 0,
-            1/256 ,      0, 0, 0,
-            -1/256,  1/256, 0, 0,
-            0     ,  1/256, 0, 0,
-            1/256 ,  1/256, 0, 0,
+            1 ,      0, 0, 0,
+            -1,  1, 0, 0,
+            0     ,  1, 0, 0,
+            1 ,  1, 0, 0,
         ]));
 
 
