@@ -6,7 +6,7 @@ export default class WebGPUContext {
     context: GPUCanvasContext;
     input: GPUTexture;
     output: GPUTexture;
-    textures: {}
+    textures: any;
 
     constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
 
@@ -45,7 +45,7 @@ export default class WebGPUContext {
     }
 
 
-    texture(key): GPUTexture {
+    texture(key:string): GPUTexture {
 
         if(!this.textures[key]){
 

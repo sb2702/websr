@@ -1,4 +1,9 @@
 
+interface Uniform {
+    name: string,
+    type: string
+}
+
 class Layer {
 
     device: GPUDevice;
@@ -10,8 +15,8 @@ class Layer {
     label: string;
     inputTexture: GPUTexture;
     outputTexture: GPUTexture;
-    uniforms: any[];
-    buffers: {};
+    uniforms: Uniform[];
+    buffers: any;
 
     constructor(device:GPUDevice, inputTexture: GPUTexture, outputTexture:GPUTexture){
         this.device = device;
@@ -56,7 +61,7 @@ class Layer {
     }
 
 
-    createUniform(name, type){
+    createUniform(name:string, type:string){
 
         this.uniforms.push({name, type});
 
@@ -108,7 +113,7 @@ class Layer {
 
     }
 
-    createStandardShader(fragmentShader): GPUShaderModule{
+    createStandardShader(fragmentShader: string): GPUShaderModule{
 
 
         return  this.device.createShaderModule({
