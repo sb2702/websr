@@ -10,8 +10,8 @@ class NeuralNetwork {
     constructor(context: WebGPUContext, weights?: any) {
 
         this.context = context;
-        this.layers = this.model();
         this.weights = weights;
+        this.layers = this.model();
     }
 
 
