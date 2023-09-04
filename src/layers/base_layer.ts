@@ -16,7 +16,7 @@ class Layer {
     inputTexture: GPUTexture;
     outputTexture: GPUTexture;
     uniforms: Uniform[];
-    buffers: any;
+    buffers: Record<string, GPUBuffer>;
 
     constructor(device:GPUDevice, inputTexture: GPUTexture, outputTexture:GPUTexture){
         this.device = device;

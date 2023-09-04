@@ -6,7 +6,7 @@ export default class WebGPUContext {
     context: GPUCanvasContext;
     input: GPUTexture;
     output: GPUTexture;
-    textures: any;
+    textures: Record<string, GPUTexture>;
 
     constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
 
