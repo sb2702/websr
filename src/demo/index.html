@@ -18,7 +18,9 @@
 
         if(!gpu) return console.log("Unable to load WebGPU");
 
-        const websr = new WebSR(gpu, canvas);
+        const weights = await (await fetch('./anime4k-cnn-2x-s.json')).json()
+
+        const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, canvas);
 
         console.log("Loaded WebSR", websr);
 

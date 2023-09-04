@@ -2,8 +2,7 @@
 import WebGPUContext from './context'
 import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
-import PoCNetwork from "./networks/poc_network";
-
+import {NetworkList, NetworkName} from "./networks/network_list";
 
 export default class WebSR {
     private canvas: HTMLCanvasElement;
@@ -11,11 +10,15 @@ export default class WebSR {
     private network: NeuralNetwork;
     private renderer: WebSRRenderer;
 
-    constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
+    constructor(network_name: NetworkName, weights: any, device: GPUDevice,  canvas: HTMLCanvasElement) {
 
         this.canvas = canvas;
         this.context = new WebGPUContext(device, canvas);
-        this.network = new PoCNetwork(this.context);
+
+        if(!NetworkList[network_name]) throw Error(`Network ${network_name} is not defined or implemented`);
+
+        this.network = new NetworkList[network_name](this.context);
+
         this.renderer = new WebSRRenderer(this.context, this.network);
 
     }
