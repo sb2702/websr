@@ -17,7 +17,7 @@ export default class WebSR {
 
         if(!NetworkList[network_name]) throw Error(`Network ${network_name} is not defined or implemented`);
 
-        this.network = new NetworkList[network_name](this.context);
+        this.network = new NetworkList[network_name](this.context, weights);
 
         this.renderer = new WebSRRenderer(this.context, this.network);
 

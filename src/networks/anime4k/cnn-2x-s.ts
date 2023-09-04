@@ -7,9 +7,11 @@ import GuassianLayer from "../../layers/gaussian";
 
 export default class Anime4KCNN2XS extends NeuralNetwork{
 
-    constructor(context: WebGPUContext) {
-        super(context);
+    constructor(context: WebGPUContext, weights: any) {
+        super(context, weights);
         console.log("Loading Anime4K network");
+        console.log("Network weights");
+        console.log(weights);
     }
 
 
