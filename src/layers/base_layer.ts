@@ -16,14 +16,16 @@ class Layer {
     inputTexture: GPUTexture;
     outputTexture: GPUTexture;
     uniforms: Uniform[];
+    weights: any;
     buffers: Record<string, GPUBuffer>;
 
-    constructor(device:GPUDevice, inputTexture: GPUTexture, outputTexture:GPUTexture){
+    constructor(device:GPUDevice, inputTexture: GPUTexture, outputTexture:GPUTexture, weights?: any){
         this.device = device;
         this.inputTexture = inputTexture;
         this.outputTexture = outputTexture;
         this.uniforms =  [];
         this.buffers = {};
+        this.weights = weights;
     }
 
 
