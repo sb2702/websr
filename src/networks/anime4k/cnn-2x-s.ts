@@ -25,8 +25,6 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const weights = this.weights.layers;
 
-        console.log(weights['conv2d_tf']);
-
         const context = this.context;
 
         const conv2d_tf = new Anime4KConv3x4(context.device, context.input, context.texture('conv2d_tf'), weights['conv2d_tf']);
@@ -39,7 +37,6 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
 
         layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf);
-
 
         layers.push(new RGB2YUV(context.device, context.input, context.texture('yuv')));
 
