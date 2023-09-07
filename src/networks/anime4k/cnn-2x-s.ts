@@ -39,14 +39,14 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const dummy_layer = new DummyLayer(context.device, context.input, context.texture('dummy'));
 
-        const pixel_shuffle = new PixelShuffle2X(context.device, context.texture('dummy'), this.context.output);
+        const rgb2yuv = new RGB2YUV(context.device, context.input, context.texture('yuv'));
 
+        const gaussian = new GuassianLayer(this.context.device, context.texture('yuv'), context.texture('gaussian'));
 
-        layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, dummy_layer, pixel_shuffle);
+        const pixel_shuffle = new PixelShuffle2X(context.device, context.texture('gaussian'), this.context.output);
 
-        //layers.push(new RGB2YUV(context.device, context.input, context.texture('yuv')));
+        layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, dummy_layer, rgb2yuv, gaussian, pixel_shuffle);
 
-      //  layers.push(new GuassianLayer(this.context.device, context.texture('yuv'), this.context.output));
 
         return layers;
 
