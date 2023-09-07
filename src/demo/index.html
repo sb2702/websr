@@ -9,9 +9,12 @@
 
 <img id="img" src="test.png" />
 <canvas id="canvas" width="256" height="256"></canvas>
+<canvas id="canvas2" width="512" height="512"></canvas>
+
 <script>
 
-    const canvas = document.getElementById('canvas');
+    const workingCanvas = document.getElementById('canvas');
+    const destinationCanvas = document.getElementById('canvas2')
 
 
     WebSR.initWebGPU().then(async function (gpu) {
@@ -20,7 +23,7 @@
 
         const weights = await (await fetch('./anime4k-cnn-2x-s.json')).json()
 
-        const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, canvas);
+        const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, workingCanvas, destinationCanvas);
 
         console.log("Loaded WebSR", websr);
 

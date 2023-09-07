@@ -7,11 +7,12 @@ export default class WebGPUContext {
     input: GPUTexture;
     output: GPUTexture;
     textures: Record<string, GPUTexture>;
+    destinationContext: GPUCanvasContext;
 
-    constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
+    constructor(device: GPUDevice, workingCanvas: HTMLCanvasElement, destinationCanvas: HTMLCanvasElement) {
 
         this.device = device;
-        this.canvas = canvas;
+        this.canvas = workingCanvas;
         this.textures = {};
 
 
@@ -23,10 +24,17 @@ export default class WebGPUContext {
         });
 
 
+        this.destinationContext = destinationCanvas.getContext('webgpu');
+        this.destinationContext.configure({
+            device: this.device,
+            format: navigator.gpu.getPreferredCanvasFormat()
+        })
+
+
 
         const inputTexture = device.createTexture({
             label: 'Input Image',
-            size: [canvas.width, canvas.height],
+            size: [workingCanvas.width, workingCanvas.height],
             format: 'rgba8unorm',
             usage:
                 GPUTextureUsage.TEXTURE_BINDING |
@@ -38,7 +46,7 @@ export default class WebGPUContext {
 
         this.input = inputTexture;
 
-        this.output = this.context.getCurrentTexture();
+        this.output = this.destinationContext.getCurrentTexture();
         
         
 
