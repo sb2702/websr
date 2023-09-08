@@ -6,8 +6,8 @@ class DummyLayer extends Layer {
     label = "Dummy"
 
 
-    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
-        super(device, inputTexture, outputTexture)
+    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
+        super(device, inputTextures, outputTexture)
 
 
 

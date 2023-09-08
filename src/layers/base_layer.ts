@@ -13,15 +13,15 @@ class Layer {
     renderPassDescriptor: GPURenderPassDescriptor;
     bindGroup: GPUBindGroup;
     label: string;
-    inputTexture: GPUTexture;
+    inputTextures: GPUTexture[];
     outputTexture: GPUTexture;
     uniforms: Uniform[];
     weights: any;
     buffers: Record<string, GPUBuffer>;
 
-    constructor(device:GPUDevice, inputTexture: GPUTexture, outputTexture:GPUTexture, weights?: any){
+    constructor(device:GPUDevice, inputTextures: GPUTexture[], outputTexture:GPUTexture, weights?: any){
         this.device = device;
-        this.inputTexture = inputTexture;
+        this.inputTextures = inputTextures;
         this.outputTexture = outputTexture;
         this.uniforms =  [];
         this.buffers = {};
@@ -136,13 +136,16 @@ class Layer {
 
     fragmentShaderInputs(){
 
-        const inputs = [
-        '@group(0) @binding(0) var inputTexture: texture_2d<f32>;'
-        ];
+        const inputs = [];
+
+        for (let i=0; i < this.inputTextures.length; i++){
+            inputs.push(`@group(0) @binding(0) var inputTexture${i}: texture_2d<f32>;`)
+        }
+
 
         this.uniforms.forEach((uniform,i)=>{
             inputs.push(
-                `@group(0) @binding(${i+1}) var <uniform> ${uniform.name}: ${uniform.type};`,
+                `@group(0) @binding(${i+this.inputTextures.length}) var <uniform> ${uniform.name}: ${uniform.type};`,
             )
         });
 
@@ -170,15 +173,17 @@ class Layer {
 
     defaultBindGroup(){
 
-        const entries: any[]  = [
-            { binding: 0, resource: this.inputTexture.createView()}
+        const entries: any[]  = [];
 
-        ];
+        this.inputTextures.forEach(function (texture, i) {
+            entries.push({ binding: i, resource: texture.createView()})
+        });
+
 
         this.uniforms.forEach((uniform, i)=>{
             entries.push(
                 {
-                    binding: i+1,
+                    binding: i+this.inputTextures.length,
                     resource: {
                         buffer: this.buffers[uniform.name]
                     }

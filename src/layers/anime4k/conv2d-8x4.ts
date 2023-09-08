@@ -6,8 +6,8 @@ class Anime4KConv8x4 extends Layer {
     label = "Anime4KConv8x4"
 
 
-    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture, weights: any){
-        super(device, inputTexture, outputTexture, weights)
+    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture, weights: any){
+        super(device, inputTextures, outputTexture, weights)
 
 
         const kernels: number[] = weights.weights;
@@ -26,11 +26,11 @@ class Anime4KConv8x4 extends Layer {
                      var result  = vec4f(0.0, 0.0, 0.0, 0.0);
                       
                      for(var i = 0u; i < 9; i++){
-                       result += kernels[i]*max(textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i].xy),0) , vec4f(0.0));
+                       result += kernels[i]*max(textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy),0) , vec4f(0.0));
                     }
                     
                      for(var i = 0u; i < 9; i++){
-                       result += kernels[i+9]*max(-1.0*textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i].xy), 0), vec4f(0.0));
+                       result += kernels[i+9]*max(-1.0*textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy), 0), vec4f(0.0));
                     }  
                     
                     result += bias;

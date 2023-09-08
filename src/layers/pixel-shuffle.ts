@@ -6,8 +6,8 @@ class PixelShuffle2X extends Layer {
     label = "PixelShuffle2X"
 
 
-    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
-        super(device, inputTexture, outputTexture)
+    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
+        super(device, inputTextures, outputTexture)
 
 
 
@@ -61,7 +61,7 @@ class PixelShuffle2X extends Layer {
                     let x = i32(256.0*(input.tex_coord.x));
                     let y = i32(256.0*(input.tex_coord.y));
                     
-                    let value = textureLoad(inputTexture, vec2<i32>(x, y), 0)[c_index];
+                    let value = textureLoad(inputTexture0, vec2<i32>(x, y), 0)[c_index];
                    
                     
                     return vec4f(value, value, value, 1.0);

@@ -6,9 +6,9 @@ class RGB2YUV extends Layer {
     label: "RGB2YUV"
 
 
-    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
+    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
 
-        super(device, inputTexture, outputTexture)
+        super(device, inputTextures, outputTexture)
 
         this.createUniform("rgb2yuv", "mat3x3f");
 
@@ -16,7 +16,7 @@ class RGB2YUV extends Layer {
         
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
               
-                    let color = textureLoad(inputTexture, vec2<i32>(input.tex_coord), 0);       
+                    let color = textureLoad(inputTexture0, vec2<i32>(input.tex_coord), 0);       
                     let yuv = rgb2yuv*color.xyz;
           
                 return vec4f(yuv, 1.0);

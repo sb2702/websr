@@ -6,8 +6,8 @@ class GuassianLayer extends Layer {
     label = "Gaussian"
 
 
-    constructor(device: GPUDevice, inputTexture: GPUTexture, outputTexture: GPUTexture){
-        super(device, inputTexture, outputTexture)
+    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
+        super(device, inputTextures, outputTexture)
 
 
         this.createUniform("gaussian", "array<vec3f, 3>");
@@ -23,9 +23,9 @@ class GuassianLayer extends Layer {
                      for(var i = 0u; i < 3; i++){
                      
                         let a = vec3f(
-                            textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x,
-                            textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x,
-                            textureLoad(inputTexture, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x
+                            textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x,
+                            textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x,
+                            textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i*3].xy), 0).x
                         );
                         
                         val += dot(a, gaussian[i]);

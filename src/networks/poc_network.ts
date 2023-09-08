@@ -18,9 +18,9 @@ export default class PoCNetwork extends NeuralNetwork{
 
         const context = this.context;
 
-        layers.push(new RGB2YUV(context.device, context.input, context.texture('yuv')));
+        layers.push(new RGB2YUV(context.device, [context.input], context.texture('yuv')));
 
-        layers.push(new GuassianLayer(this.context.device, context.texture('yuv'), this.context.output));
+        layers.push(new GuassianLayer(this.context.device, [context.texture('yuv')], this.context.output));
 
         return layers;
 
