@@ -58,19 +58,19 @@ class PixelShuffle2X extends Layer {
                     var c_index: i32 = 0;
                     
                     if(x_floor == 0 && y_floor == 0){
-                        c_index = 2;
+                        c_index = 1;
                     }
                     
                     if(x_floor == 1 && y_floor == 0){
-                        c_index = 0;
-                    }
-                    
-                    if(x_floor == 0 && y_floor == 1){
                         c_index = 3;
                     }
                     
+                    if(x_floor == 0 && y_floor == 1){
+                        c_index = 0;
+                    }
+                    
                     if(x_floor == 1 && y_floor == 1){
-                        c_index = 1;
+                        c_index = 2;
                     }
                     
            
