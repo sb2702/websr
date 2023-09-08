@@ -1,5 +1,4 @@
-import Layer from "./base_layer";
-
+import Layer from "../base_layer";
 
 class GuassianLayer extends Layer {
 

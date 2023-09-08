@@ -1,4 +1,4 @@
-import Layer from "./base_layer";
+import Layer from "../base_layer";
 
 
 class DummyLayer extends Layer {

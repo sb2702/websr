@@ -1,4 +1,4 @@
-import Layer from "./base_layer";
+import Layer from "../base_layer";
 
 
 class RGB2YUV extends Layer {
