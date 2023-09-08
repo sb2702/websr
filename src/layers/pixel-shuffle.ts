@@ -54,7 +54,6 @@ class PixelShuffle2X extends Layer {
                   
                     let x_floor  = u32(fract(input.tex_coord.x*256.0)*2.0);
                     
-                    
                     let y_floor  = u32(fract(input.tex_coord.y*256.0)*2.0);
                     
                     //I don t know, I think this is right? I found this by trial and error
@@ -67,9 +66,7 @@ class PixelShuffle2X extends Layer {
                     
                     let bicubic = textureSample(inputTexture, ourSampler, input.tex_coord);
                     
-                    
-                  
-                    return vec4f(bicubic.x+value, bicubic.y+value, bicubic.z+value, 1.0);
+                    return bicubic + vec4f(value);
                 
                   }            
         `

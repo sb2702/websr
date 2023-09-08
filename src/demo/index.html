@@ -7,7 +7,7 @@
 </head>
 <body style="background: gray;">
 
-<img id="img" src="test.png" style="display: none;" />
+<img id="img" src="test.png" height="512" width="512"  style="display: none;" />
 <canvas id="canvas" width="256" height="256" style="display: none;"></canvas>
 <canvas id="canvas2" width="512" height="512"></canvas>
 
@@ -36,10 +36,25 @@
         console.log("Rendering");
 
         websr.render();
-
-
+        
     });
 
+    const image = document.getElementById('img');
+    let showingCanvas = true;
+
+
+    document.body.addEventListener('click', function () {
+
+        if(showingCanvas){
+            image.style.display = "block";
+            destinationCanvas.style.display = "none";
+        } else {
+            image.style.display = "none";
+            destinationCanvas.style.display = "block";
+        }
+
+        showingCanvas = !showingCanvas;
+    })
 
 </script>
 
