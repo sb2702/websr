@@ -60,7 +60,7 @@ export default class WebGPUContext {
             this.textures[key] = this.device.createTexture({
                 label: key,
                 size: [this.context.canvas.width, this.context.canvas.height],
-                format: 'rgba8unorm',
+                format: 'rgba32float',
                 usage:
                     GPUTextureUsage.TEXTURE_BINDING |
                     GPUTextureUsage.COPY_DST |

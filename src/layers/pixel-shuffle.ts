@@ -57,7 +57,7 @@ class PixelShuffle2X extends Layer {
                     let x = i32(256.0*(input.tex_coord.x - x_floor));
                     let y = i32(256.0*(input.tex_coord.y - y_floor));
                     
-                    let value = textureLoad(inputTexture, vec2<i32>(x, y), 0)[c_index];
+                    let value = 5.0*textureLoad(inputTexture, vec2<i32>(x, y), 0)[c_index];
                    
                     
                     return vec4f(value, value, value, 1.0);
