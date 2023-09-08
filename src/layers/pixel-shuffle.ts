@@ -55,29 +55,13 @@ class PixelShuffle2X extends Layer {
                     
                     let y_floor  = u32(fract(input.tex_coord.y*256.0)*2.0);
                     
-                    var c_index: i32 = 0;
-                    
-                    if(x_floor == 0 && y_floor == 0){
-                        c_index = 1;
-                    }
-                    
-                    if(x_floor == 1 && y_floor == 0){
-                        c_index = 3;
-                    }
-                    
-                    if(x_floor == 0 && y_floor == 1){
-                        c_index = 0;
-                    }
-                    
-                    if(x_floor == 1 && y_floor == 1){
-                        c_index = 2;
-                    }
-                    
-           
+                    //I don t know, I think this is right? I found this by trial and error
+                    let c_index: u32 = 2*x_floor + 1-y_floor;  
+              
                     let x = i32(256.0*(input.tex_coord.x));
                     let y = i32(256.0*(input.tex_coord.y));
                     
-                    let value = 5.0*textureLoad(inputTexture, vec2<i32>(x, y), 0)[c_index];
+                    let value = textureLoad(inputTexture, vec2<i32>(x, y), 0)[c_index];
                    
                     
                     return vec4f(value, value, value, 1.0);
