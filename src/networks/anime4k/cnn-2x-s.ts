@@ -13,7 +13,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
     constructor(context: WebGPUContext, weights: any) {
         super(context, weights);
-        
+
     }
 
 
@@ -39,10 +39,9 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const gaussian = new GuassianLayer(this.context.device, [context.texture('yuv')], context.texture('gaussian'));
 
-        const pixel_shuffle = new PixelShuffle2X(context.device, [context.texture('conv2d_last_tf')], this.context.output);
+        const pixel_shuffle = new PixelShuffle2X(context.device, [context.texture('conv2d_last_tf'), context.input], this.context.output);
 
         layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, dummy_layer, rgb2yuv, gaussian, pixel_shuffle);
-
 
         return layers;
 
