@@ -40,7 +40,7 @@ class PixelShuffle2X extends Layer {
               vsOutput.position = vec4f(xy, 0.0, 1.0);
               vsOutput.tex_coord = xy*0.5 + 0.5;
               vsOutput.tex_coord.y = - 1.0* vsOutput.tex_coord.y  + 1.0;
-              vsOutput.tex_coord = vsOutput.tex_coord*2.0;
+              vsOutput.tex_coord = vsOutput.tex_coord;
               return vsOutput;
             }
           
@@ -50,14 +50,14 @@ class PixelShuffle2X extends Layer {
               
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                   
-                    let x_floor  = floor(input.tex_coord.x);
-                    let y_floor  = floor(input.tex_coord.y);
+                    let x_floor  = fract(input.tex_coord.x*256.0)*2.0;
+                    let y_floor  = fract(input.tex_coord.y*256.0)*2.0;
                     let c_index = i32(x_floor) + i32(y_floor)*2;
                     
-                    let x = i32(256.0*(input.tex_coord.x - x_floor));
-                    let y = i32(256.0*(input.tex_coord.y - y_floor));
+                    let x = i32(256.0*(input.tex_coord.x));
+                    let y = i32(256.0*(input.tex_coord.y));
                     
-                    let value = 5.0*textureLoad(inputTexture, vec2<i32>(x, y), 0)[c_index];
+                    let value = 2.0*textureLoad(inputTexture, vec2<i32>(x, y), 0)[3];
                    
                     
                     return vec4f(value, value, value, 1.0);
