@@ -13,11 +13,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
     constructor(context: WebGPUContext, weights: any) {
         super(context, weights);
-        console.log("Loading Anime4K network");
-        console.log("Network weights");
-        console.log(weights);
-
-
+        
     }
 
 
@@ -37,7 +33,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const conv2d_last_tf = new Anime4KConv8x4(context.device, [context.texture('conv2d_2_tf')], context.texture('conv2d_last_tf'), weights['conv2d_last_tf']);
 
-        const dummy_layer = new DummyLayer(context.device, [context.input], context.texture('dummy'));
+        const dummy_layer = new DummyLayer(context.device, [], context.texture('dummy'));
 
         const rgb2yuv = new RGB2YUV(context.device, [context.input], context.texture('yuv'));
 

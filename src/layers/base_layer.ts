@@ -11,7 +11,7 @@ class Layer {
     pipeline: GPURenderPipeline;
     sampler: GPUSampler;
     renderPassDescriptor: GPURenderPassDescriptor;
-    bindGroup: GPUBindGroup;
+    bindGroup: GPUBindGroup | null;
     label: string;
     inputTextures: GPUTexture[];
     outputTexture: GPUTexture;
@@ -191,6 +191,8 @@ class Layer {
             )
         });
 
+        if(entries.length === 0) return  null;
+
          return this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(0),
             entries
@@ -205,7 +207,11 @@ class Layer {
         const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
         pass.setPipeline(this.pipeline);
-        pass.setBindGroup(0, this.bindGroup);
+
+        if(this.bindGroup) {
+            pass.setBindGroup(0, this.bindGroup);
+        }
+
         pass.draw(6);  // call our vertex shader 6 times
         pass.end();
 

@@ -10,50 +10,17 @@ class DummyLayer extends Layer {
         super(device, inputTextures, outputTexture)
 
 
+        this.shader = this.createStandardShader(`
+        
+              @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
+                
+                return vec4f(0.0, 0.0, 0.0, 1.0);
+              }                      
+        `);
 
 
-        this.shader = this.device.createShaderModule({
-            label: `${this.label}-shader`,
-            code: `
-          
-              ${this.defaultVertexShader()}
-              
-                  @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
-                    
-                    return vec4f(0.0, 0.0, 0.0, 1.0);
-                  }                 
-        `
-        });
-
-
-
-
-
-        this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
-
-        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
-
-
-
-
+        this.defaultSetup();
     }
-
-    run(){
-
-
-        const encoder = this.device.createCommandEncoder({label: this.label});
-
-        const pass = encoder.beginRenderPass(this.renderPassDescriptor);
-
-        pass.setPipeline(this.pipeline);
-        pass.draw(6);  // call our vertex shader 6 times
-        pass.end();
-
-        this.device.queue.submit([encoder.finish()]);
-
-
-    }
-
 
 }
 
