@@ -7,10 +7,6 @@ export default class WebGPUContext {
     textures: Record<string, GPUTexture>;
     destinationContext: GPUCanvasContext;
 
-    static  bitsPerPixelbyFormat = {
-        'rgba8unorm': 4,
-        'rgba32float': 16
-    }
     private debug: boolean;
     private usage: number;
 
@@ -73,7 +69,9 @@ export default class WebGPUContext {
 
         const texture = this.textures[textureName];
 
-        const bitsPerPixel = WebGPUContext.bitsPerPixelbyFormat[texture.format];
+        let bitsPerPixel = 16;
+
+        if(texture.format === 'rgba8unorm') bitsPerPixel = 4;
 
 
         const resultBuffer = this.device.createBuffer({

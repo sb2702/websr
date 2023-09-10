@@ -48,10 +48,8 @@ module.exports = {
 
         new CopyWebpackPlugin( {
             patterns: [
-                { from: "src/demo/test.png", to: path.basename('test.png') },
-                { from: "src/demo/tf-pred.png", to: path.basename('tf-pred.png') },
-                { from: "src/demo/anime4k-cnn-2x-s.json", to: path.basename('anime4k-cnn-2x-s.json') },
-                { from: "src/demo/anime4k-cnn-2x-s-debug.json", to: path.basename('anime4k-cnn-2x-s-debug.json') }
+                { from: "src/demo/*.png", to: path.basename('') },
+                { from: "src/demo/*.json", to: path.basename('') }
             ]
         })
 
