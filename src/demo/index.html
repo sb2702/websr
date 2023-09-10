@@ -7,10 +7,10 @@
 </head>
 <body style="background: gray;">
 
-<img id="img" src="test.png" height="512" width="512"  />
+<img id="img" src="test.png" height="512" width="512"  style="display: none;" />
 <canvas id="canvas" width="256" height="256" style="display: none;"></canvas>
-<canvas id="canvas2" width="512" height="512"></canvas>
-<img id="ref" src="tf-pred.png" height="512" width="512"  />
+<canvas id="canvas2" width="512" height="512" style="display: none;"></canvas>
+<img id="ref" src="tf-pred.png" height="512" width="512"  style="display: none;" />
 
 <script>
 
@@ -51,7 +51,7 @@
 
         for (let layer_name in debug_weights){
 
-            console.log(`Running analysis for layer ${layer_name}`);
+        //    console.log(`Running analysis for layer ${layer_name}`);
 
             const ref_values = debug_weights[layer_name];
 
@@ -97,6 +97,8 @@
             }
 
 
+
+            console.log(`MSE for layer ${layer_name}: ${mse}`);
         }
 
 
