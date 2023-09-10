@@ -48,8 +48,8 @@ module.exports = {
 
         new CopyWebpackPlugin( {
             patterns: [
-                { from: "src/demo/*.png", to: path.basename('') },
-                { from: "src/demo/*.json", to: path.basename('') }
+                { from: "src/demo/*.png", to: path.basename('[name].png') },
+                { from: "src/demo/*.json", to: path.basename('[name].json') }
             ]
         })
 
