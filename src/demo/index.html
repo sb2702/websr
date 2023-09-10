@@ -43,12 +43,34 @@
         console.log("Loading debug weights");
         const debug_weights = await (await fetch('./anime4k-cnn-2x-s-debug-weights.json')).json()
 
-        debug_weights.output = debug_weights.final;
 
         delete debug_weights.final;
 
         console.log("Debug weights");
         console.log(debug_weights);
+
+        for (let layer_name in debug_weights){
+
+            console.log(`Running analysis for layer ${layer_name}`);
+
+            const ref_values = debug_weights[layer_name];
+
+            const output_values = await websr.context.readTexture(layer_name);
+
+            console.log("Output values")
+            console.log(output_values);
+
+            console.log("Ref values");
+            console.log(ref_values);
+
+
+
+        }
+
+
+
+
+
 
 
 

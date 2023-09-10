@@ -109,8 +109,9 @@ export default class WebGPUContext {
 
         await resultBuffer.mapAsync(GPUMapMode.READ);
 
-        if(bitsPerPixel == 4) return  new Uint8ClampedArray(resultBuffer.getMappedRange());
-        else if(bitsPerPixel == 16) return new Float32Array(resultBuffer.getMappedRange());
+        if(texture.format === 'r32float') return  new Float32Array(resultBuffer.getMappedRange());
+        else if(texture.format === 'rgba32float') return  new Float32Array(resultBuffer.getMappedRange());
+        else if(texture.format === 'rgba8unorm') return new Uint8ClampedArray(resultBuffer.getMappedRange());
 
         return  new Float32Array(0);
     }
