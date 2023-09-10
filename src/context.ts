@@ -39,7 +39,8 @@ export default class WebGPUContext {
         
         this.debug = true;
 
-        this.usage = this.debug? GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT 
+        this.usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
+        if(this.debug) this.usage  = this.usage |  GPUTextureUsage.COPY_SRC;
         
 
         const inputTexture = device.createTexture({
