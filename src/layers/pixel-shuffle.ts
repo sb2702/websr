@@ -57,7 +57,7 @@ class PixelShuffle2X extends Layer {
                     let y_floor  = u32(fract(input.tex_coord.y*256.0)*2.0);
                     
                     //I don t know, I think this is right? I found this by trial and error
-                    let c_index: u32 = 2*x_floor + 1-y_floor;  
+                    let c_index: u32 = x_floor + y_floor*2;  
               
                     let x = i32(256.0*(input.tex_coord.x));
                     let y = i32(256.0*(input.tex_coord.y));

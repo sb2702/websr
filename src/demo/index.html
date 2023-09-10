@@ -10,6 +10,7 @@
 <img id="img" src="test.png" height="512" width="512"  />
 <canvas id="canvas" width="256" height="256" style="display: none;"></canvas>
 <canvas id="canvas2" width="512" height="512"></canvas>
+<img id="ref" src="tf-pred.png" height="512" width="512"  />
 
 <script>
 
@@ -21,7 +22,7 @@
 
         if(!gpu) return console.log("Unable to load WebGPU");
 
-        const weights = await (await fetch('./anime4k-cnn-2x-s.json')).json()
+        const weights = await (await fetch('./anime4k-cnn-2x-s-debug.json')).json()
 
         const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, workingCanvas, destinationCanvas);
 
