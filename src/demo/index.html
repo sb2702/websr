@@ -57,12 +57,44 @@
 
             const output_values = await websr.context.readTexture(layer_name);
 
-            console.log("Output values")
-            console.log(output_values);
 
-            console.log("Ref values");
-            console.log(ref_values);
+            let width = layer_name === "pixel_shuffle" ? 512: 256;
+            let height= layer_name === "pixel_shuffle" ? 512: 256;
 
+            let samples = 0;
+            let mse = 0;
+
+
+            for(let j =0; j < height; j++){
+                for(let i=0; i < width; i++){
+
+                    samples++;
+
+                    if(layer_name === 'pixel_shuffle'){
+                        let output_value = output_values[j*width + i];
+                        let ref_value = ref_values[j][i][0];
+
+                        mse += Math.pow(ref_value-output_value, 2);
+
+                       //
+                    } else {
+
+                        let index = (j*width + i)*4;
+                        for(let k = 0; k < 4; k++){
+                            let output_value = output_values[index + k];
+                            let ref_value = ref_values[j][i][k];
+
+                            mse += Math.pow(ref_value-output_value, 2);
+                        }
+
+
+
+                    }
+
+
+
+                }
+            }
 
 
         }
