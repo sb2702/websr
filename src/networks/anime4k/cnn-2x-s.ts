@@ -3,7 +3,8 @@ import Layer from "../../layers/base_layer";
 import NeuralNetwork from "../base_network";
 import Anime4KConv3x4 from "../../layers/anime4k/conv2d-3x4";
 import Anime4KConv8x4 from "../../layers/anime4k/conv2d-8x4";
-import PixelShuffle2X from "../../layers/pixel-shuffle";
+import PixelShuffle2X from "../../layers/anime4k/pixel-shuffle";
+import DisplayLayer from "../../layers/anime4k/display";
 
 
 export default class Anime4KCNN2XS extends NeuralNetwork{
@@ -30,9 +31,14 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const conv2d_last_tf = new Anime4KConv8x4(context.device, [context.texture('conv2d_2_tf')], context.texture('conv2d_last_tf'), weights['conv2d_last_tf']);
 
-        const pixel_shuffle = new PixelShuffle2X(context.device, [context.texture('conv2d_last_tf'), context.texture('input')], context.texture('output'));
+        const pixel_shuffle = new PixelShuffle2X(context.device, [context.texture('conv2d_last_tf')], context.texture('pixel_shuffle', {width: 512, height: 512, format: "r32float"}));
 
-        layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, pixel_shuffle);
+
+        console.log("Pixel shuffle texture");
+        console.log(context.texture('pixel_shuffle'));
+       const paint = new DisplayLayer(context.device, [context.texture('pixel_shuffle'), context.texture('input')], context.texture('output'));
+
+        layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, pixel_shuffle, paint);
 
         return layers;
 

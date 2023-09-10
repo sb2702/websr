@@ -1,4 +1,11 @@
 
+
+interface TextureOptions {
+    width?: number,
+    height?: number,
+    format?: GPUTextureFormat
+}
+
 export default class WebGPUContext {
 
     canvas: HTMLCanvasElement;
@@ -72,6 +79,7 @@ export default class WebGPUContext {
         let bitsPerPixel = 16;
 
         if(texture.format === 'rgba8unorm') bitsPerPixel = 4;
+        if(texture.format === 'r32float') bitsPerPixel = 4;
 
 
         const resultBuffer = this.device.createBuffer({
@@ -108,14 +116,16 @@ export default class WebGPUContext {
     }
 
 
-    texture(key:string): GPUTexture {
+    texture(key:string, options?: TextureOptions): GPUTexture {
 
         if(!this.textures[key]){
 
+            options = options || {};
+
             this.textures[key] = this.device.createTexture({
                 label: key,
-                size: [this.context.canvas.width, this.context.canvas.height],
-                format: 'rgba32float',
+                size: [options.width || this.context.canvas.width, options.height || this.context.canvas.height],
+                format: options.format || 'rgba32float',
                 usage: this.usage
             });
         }

@@ -1,10 +1,9 @@
-import Layer from "./base_layer";
+import Layer from "../base_layer";
 
 
-class PixelShuffle2X extends Layer {
+class DisplayLayer extends Layer {
 
-    label = "PixelShuffle2X"
-
+    label = "DisplayLayer"
 
     constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
         super(device, inputTextures, outputTexture)
@@ -46,23 +45,17 @@ class PixelShuffle2X extends Layer {
           
 
               
-               @group(0) @binding(0) var featureMap: texture_2d<f32>;
+               @group(0) @binding(0) var pixelShuffle: texture_2d<f32>;
                @group(0) @binding(1) var inputTexture: texture_2d<f32>;
                @group(0) @binding(2) var ourSampler: sampler;
               
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                   
-                    let x_floor  = u32(fract(input.tex_coord.x*256.0)*2.0);
-                    
-                    let y_floor  = u32(fract(input.tex_coord.y*256.0)*2.0);
-                    
-                    //I don t know, I think this is right? I found this by trial and error
-                    let c_index: u32 = x_floor + y_floor*2;  
               
-                    let x = i32(256.0*(input.tex_coord.x));
-                    let y = i32(256.0*(input.tex_coord.y));
+                    let x = i32(512.0*(input.tex_coord.x));
+                    let y = i32(512.0*(input.tex_coord.y));
                     
-                    let value = textureLoad(featureMap, vec2<i32>(x, y), 0)[c_index];
+                    let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
                     
                     let bicubic = textureSample(inputTexture, ourSampler, input.tex_coord);
                     
@@ -106,4 +99,4 @@ class PixelShuffle2X extends Layer {
 
 }
 
-export default PixelShuffle2X;
+export default DisplayLayer;
