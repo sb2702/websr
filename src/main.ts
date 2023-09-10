@@ -5,10 +5,10 @@ import NeuralNetwork from "./networks/base_network";
 import {NetworkList, NetworkName} from "./networks/network_list";
 
 export default class WebSR {
-    private canvas: HTMLCanvasElement;
-    private context: WebGPUContext;
-    private network: NeuralNetwork;
-    private renderer: WebSRRenderer;
+    canvas: HTMLCanvasElement;
+    context: WebGPUContext;
+    network: NeuralNetwork;
+    renderer: WebSRRenderer;
 
     constructor(network_name: NetworkName, weights: any, device: GPUDevice,  workingCanvas: HTMLCanvasElement, destinationCanvas: HTMLCanvasElement) {
 

@@ -22,7 +22,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const context = this.context;
 
-        const conv2d_tf = new Anime4KConv3x4(context.device, [context.input], context.texture('conv2d_tf'), weights['conv2d_tf']);
+        const conv2d_tf = new Anime4KConv3x4(context.device, [context.texture('input')], context.texture('conv2d_tf'), weights['conv2d_tf']);
 
         const conv2d_1_tf = new Anime4KConv8x4(context.device, [context.texture('conv2d_tf')], context.texture('conv2d_1_tf'), weights['conv2d_1_tf']);
 
@@ -30,7 +30,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const conv2d_last_tf = new Anime4KConv8x4(context.device, [context.texture('conv2d_2_tf')], context.texture('conv2d_last_tf'), weights['conv2d_last_tf']);
 
-        const pixel_shuffle = new PixelShuffle2X(context.device, [context.texture('conv2d_last_tf'), context.input], this.context.output);
+        const pixel_shuffle = new PixelShuffle2X(context.device, [context.texture('conv2d_last_tf'), context.texture('input')], context.texture('output'));
 
         layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, pixel_shuffle);
 

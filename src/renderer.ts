@@ -18,7 +18,7 @@ export default class WebSRRenderer{
 
         const device  = this.context.device;
 
-        device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.input}, [image.width, image.height]);
+        device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input')}, [image.width, image.height]);
 
     }
 

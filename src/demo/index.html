@@ -32,11 +32,18 @@
 
         console.log("Feeding bitmap into WebSR");
 
-        websr.loadImage(bitmap);
+        await websr.loadImage(bitmap);
 
         console.log("Rendering");
 
-        websr.render();
+        await websr.render();
+
+
+        const last_layer = await websr.context.readTexture('conv2d_last_tf');
+
+        console.log("Last layer value");
+        console.log(last_layer);
+
 
     });
 
