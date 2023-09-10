@@ -64,6 +64,12 @@
 
             let mse = 0;
 
+            const debug_data = [];
+
+            for(let k =0; k< channels; k++){
+                debug_data.push(new Uint8ClampedArray(width*height*4))
+            }
+
 
             for(let j =0; j < height; j++){
                 for(let i=0; i < width; i++){
@@ -76,11 +82,52 @@
 
                         let diff = Math.pow(ref_value-output_value, 2);
 
+                        let debug_index = (j*width + i)*4;
+
+
+                        debug_data[k].fill(Math.round(diff*255), debug_index, debug_index+3 );
+                        debug_data[k][debug_index + 3] = 255;
+
                         mse += diff;
                     }
 
                 }
             }
+
+
+            const div = document.createElement('div');
+            div.style.float = "none";
+            div.style.width = `${width*channels}px`;
+
+            const node = document.createElement('Div');
+            node.style.width = `${width*channels}px`;
+            node.innerText  = `Layer ${layer_name}`;
+
+            div.appendChild(node);
+
+
+            for (let k = 0; k< channels; k++){
+                const data = debug_data[k];
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.style.float = "left";
+                const ctx = canvas.getContext('2d');
+
+                const image_data = new ImageData(data, width, height);
+
+                console.log("Putting image data");
+
+                ctx.putImageData(image_data, 0, 0);
+
+                div.appendChild(canvas);
+
+            }
+
+            document.body.appendChild(div);
+
+
 
             console.log(`MSE for layer ${layer_name}: ${mse}`);
         }
