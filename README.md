@@ -8,7 +8,7 @@ A free and open-source Javascript library / SDK for running practical, real-time
 - [x] Basic Library Structure
 - [x] Implement Basic Image Processing Operations
 - [x] Implement complete, basic Neural network
-- [ ] Add tests for Mean Squared Error of network output
+- [x] Add tests for Mean Squared Error of network output
 - [ ] Implement for Video
 - [ ] Redo API for easier use
 - [ ] Update documentation
