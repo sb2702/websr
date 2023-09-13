@@ -58,7 +58,8 @@ class Layer {
               vsOutput.position = vec4f(xy, 0.0, 1.0);
               vsOutput.tex_coord = xy*0.5 + 0.5;
               vsOutput.tex_coord.y = - 1.0* vsOutput.tex_coord.y  + 1.0;
-               vsOutput.tex_coord =  vsOutput.tex_coord*256;
+               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*640;
+               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*360;
               return vsOutput;
             }
         `

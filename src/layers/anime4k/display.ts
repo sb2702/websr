@@ -52,8 +52,8 @@ class DisplayLayer extends Layer {
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                   
               
-                    let x = i32(512.0*(input.tex_coord.x));
-                    let y = i32(512.0*(input.tex_coord.y));
+                    let x = i32(1280.0*(input.tex_coord.x));
+                    let y = i32(720.0*(input.tex_coord.y));
                     
                     let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
                     
