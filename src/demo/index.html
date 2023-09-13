@@ -6,6 +6,8 @@
     <script src="websr.js" type="application/javascript"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+
+
 </head>
 <body style="margin-left: 10px;">
 
@@ -19,10 +21,17 @@
     Web GPU wasn't able to load. Sorry!
 </div>
 
+
+<div id="image-compare">
+    <video id="video" slot="first" src="hero.mp4" height="720" width="1280"  muted autoplay loop style="display: none;" ></video>
+    <canvas id="canvas" slot="second" width="1280" height="720" ></canvas>
+</div>
+
+
 <div class="row">
     <div class="col-md-4">
         <h4>Input</h4>
-        <video id="video" src="hero.mp4" height="720" width="1280"  muted autoplay loop />
+
     </div>
 
 </div>
@@ -32,7 +41,7 @@
     <div class="col-md-5">
 
         <h4>Output</h4>
-        <canvas id="canvas" width="1280" height="720"></canvas>
+
     </div>
 </div>
 
@@ -52,6 +61,9 @@
 
 <script>
 
+    let showUpscaled = true;
+
+
     const canvas = document.getElementById('canvas');
 
     WebSR.initWebGPU().then(async function (gpu) {
@@ -64,8 +76,19 @@
 
         const video = document.getElementById('video');
 
+        await new Promise(function (resolve, reject) {
 
-        const weights = await (await fetch('./anime4k-cnn-2x-s-debug.json')).json()
+            if(video.readyState > 2) return resolve();
+
+            video.oncanplay = function () {
+                resolve();
+            }
+        });
+
+        video.currentTime = 3;
+
+
+        const weights = await (await fetch('./anime4k-cnn-2x-s.json')).json()
 
         const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, canvas);
 
@@ -85,7 +108,21 @@
 
 
 
+        window.toggle = function () {
+
+            if(showUpscaled) {
+                canvas.style.display = "none";
+                video.style.display = "block";
+            } else {
+                video.style.display = "none";
+                canvas.style.display = "block";
+            }
+
+            showUpscaled = !showUpscaled;
+        }
+
     });
+
 
 
 </script>
