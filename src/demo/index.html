@@ -33,7 +33,7 @@
     <div class="col-md-5">
 
         <h4>Output</h4>
-        <canvas id="canvas2" width="512" height="512" ></canvas>
+        <canvas id="canvas" width="512" height="512"></canvas>
 
     </div>
     <div class="col-md-5">
@@ -54,15 +54,11 @@
 </div>
 
 
-<canvas id="canvas" width="256" height="256" style="display: none;"></canvas>
-
 
 
 <script>
 
     const workingCanvas = document.getElementById('canvas');
-    const destinationCanvas = document.getElementById('canvas2')
-
 
     WebSR.initWebGPU().then(async function (gpu) {
 
@@ -73,7 +69,7 @@
 
         const weights = await (await fetch('./anime4k-cnn-2x-s-debug.json')).json()
 
-        const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, workingCanvas, destinationCanvas);
+        const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, workingCanvas);
 
         console.log("Loaded WebSR", websr);
 

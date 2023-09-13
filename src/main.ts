@@ -10,10 +10,10 @@ export default class WebSR {
     network: NeuralNetwork;
     renderer: WebSRRenderer;
 
-    constructor(network_name: NetworkName, weights: any, device: GPUDevice,  workingCanvas: HTMLCanvasElement, destinationCanvas: HTMLCanvasElement) {
+    constructor(network_name: NetworkName, weights: any, device: GPUDevice,  canvas: HTMLCanvasElement) {
 
-        this.canvas = workingCanvas;
-        this.context = new WebGPUContext(device, workingCanvas, destinationCanvas);
+        this.canvas = canvas;
+        this.context = new WebGPUContext(device, canvas);
 
         if(!NetworkList[network_name]) throw Error(`Network ${network_name} is not defined or implemented`);
 

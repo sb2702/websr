@@ -12,16 +12,15 @@ export default class WebGPUContext {
     device: GPUDevice;
     context: GPUCanvasContext;
     textures: Record<string, GPUTexture>;
-    destinationContext: GPUCanvasContext;
 
     private debug: boolean;
     private usage: number;
 
 
-    constructor(device: GPUDevice, workingCanvas: HTMLCanvasElement, destinationCanvas: HTMLCanvasElement) {
+    constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
 
         this.device = device;
-        this.canvas = workingCanvas;
+        this.canvas = canvas;
         this.textures = {};
 
 
@@ -32,13 +31,6 @@ export default class WebGPUContext {
             format: navigator.gpu.getPreferredCanvasFormat()
         });
 
-
-        this.destinationContext = destinationCanvas.getContext('webgpu');
-        this.destinationContext.configure({
-            device: this.device,
-            format: navigator.gpu.getPreferredCanvasFormat()
-        })
-
         
         this.debug = true;
 
@@ -48,7 +40,7 @@ export default class WebGPUContext {
 
         const inputTexture = device.createTexture({
             label: 'Input Image',
-            size: [workingCanvas.width, workingCanvas.height],
+            size: [canvas.width/2, canvas.height/2],
             format: 'rgba8unorm',
             usage: this.usage
         });
@@ -57,7 +49,7 @@ export default class WebGPUContext {
 
         this.textures['input'] = inputTexture;
 
-        this.textures['output'] = this.destinationContext.getCurrentTexture();
+        this.textures['output'] = this.context.getCurrentTexture();
 
 
     }
@@ -125,7 +117,7 @@ export default class WebGPUContext {
 
             this.textures[key] = this.device.createTexture({
                 label: key,
-                size: [options.width || this.context.canvas.width, options.height || this.context.canvas.height],
+                size: [options.width || this.context.canvas.width/2, options.height || this.context.canvas.height/2],
                 format: options.format || 'rgba32float',
                 usage: this.usage
             });
