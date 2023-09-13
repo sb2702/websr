@@ -6,8 +6,8 @@
     <script src="websr.js" type="application/javascript"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
-
-
+    <script src="image-compare-viewer.min.js"></script>
+    <link href="image-compare-viewer.min.css" rel="stylesheet">
 </head>
 <body style="margin-left: 10px;">
 
@@ -23,7 +23,7 @@
 
 
 <div id="image-compare">
-    <video id="video" slot="first" src="hero.mp4" height="720" width="1280"  muted autoplay loop style="display: none;" ></video>
+    <video id="video" slot="first" src="hero.mp4" height="720" width="1280"  muted autoplay loop ></video>
     <canvas id="canvas" slot="second" width="1280" height="720" ></canvas>
 </div>
 
@@ -106,6 +106,10 @@
 
         video.pause();
 
+
+        const element = document.getElementById("image-compare");
+
+        const viewer = new ImageCompare(element).mount();
 
 
         window.toggle = function () {

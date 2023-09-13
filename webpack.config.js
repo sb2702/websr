@@ -49,6 +49,10 @@ module.exports = {
         new CopyWebpackPlugin( {
             patterns: [
                 { from: "src/demo/*.png", to: path.basename('[name].png') },
+                { from: "src/demo/*.mp4", to: path.basename('[name].mp4') },
+                { from: "src/demo/*.css", to: path.basename('[name].css') },
+                { from: "src/demo/*.js", to: path.basename('[name].js') },
+                { from: "src/demo/*.map", to: path.basename('[name].map') },
                 { from: "src/demo/*.json", to: path.basename('[name].json') }
             ]
         })
