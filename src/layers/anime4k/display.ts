@@ -44,7 +44,10 @@ class DisplayLayer extends Layer {
             }
           
 
+              
                @group(0) @binding(0) var pixelShuffle: texture_2d<f32>;
+               @group(0) @binding(1) var inputTexture: texture_2d<f32>;
+               @group(0) @binding(2) var ourSampler: sampler;
               
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                   
@@ -52,15 +55,23 @@ class DisplayLayer extends Layer {
                     let x = i32(1280.0*(input.tex_coord.x));
                     let y = i32(720.0*(input.tex_coord.y));
                     
-                    let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x*5.0;
+                    let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
                     
+                    let bicubic = textureSample(inputTexture, ourSampler, input.tex_coord);
                     
-                    return vec4f(value, value, value, 1.0);
+                    return bicubic + vec4f(value);
                 
                   }            
         `
         });
 
+        this.sampler =  this.device.createSampler({
+            addressModeU: "repeat",
+            addressModeV: "repeat",
+            magFilter: "linear",
+            minFilter: "linear",
+            mipmapFilter: "linear",
+        });
 
 
         this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
@@ -71,7 +82,9 @@ class DisplayLayer extends Layer {
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
 
-                { binding: 0, resource: this.inputTextures[0].createView() }
+                { binding: 0, resource: this.inputTextures[0].createView() },
+                { binding: 1, resource: this.inputTextures[1].createView() },
+                { binding: 2, resource: this.sampler }
             ]
         });
 
@@ -88,12 +101,22 @@ class DisplayLayer extends Layer {
 
         const encoder = this.device.createCommandEncoder({label: this.label});
 
-
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
 
         const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
         pass.setPipeline(this.pipeline);
+
+        this.bindGroup = this.device.createBindGroup({
+            layout: this.pipeline.getBindGroupLayout(0),
+            entries: [
+
+                { binding: 0, resource: this.inputTextures[0].createView() },
+                { binding: 1, resource: this.inputTextures[1].createView() },
+                { binding: 2, resource: this.sampler }
+            ]
+        });
+
 
         if(this.bindGroup) {
             pass.setBindGroup(0, this.bindGroup);

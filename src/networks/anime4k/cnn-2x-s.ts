@@ -34,7 +34,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const pixel_shuffle = new PixelShuffle2X( [context.texture('conv2d_last_tf')], context.texture('pixel_shuffle', {width: context.resolution.width*2, height: context.resolution.height*2, format: "r32float"}));
 
-       const paint = new DisplayLayer([context.texture('pixel_shuffle')], context.texture('output'));
+       const paint = new DisplayLayer([context.texture('pixel_shuffle'), context.texture('input')], context.texture('output'));
 
         layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_last_tf, pixel_shuffle, paint);
 
