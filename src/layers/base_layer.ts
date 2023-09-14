@@ -147,7 +147,7 @@ class Layer {
         const inputs = [];
 
         for (let i=0; i < this.inputTextures.length; i++){
-            
+
             let type = (this.inputTextures[i] instanceof GPUTexture) ? 'texture_2d<f32>' : 'texture_external';
 
             inputs.push(`@group(0) @binding(0) var inputTexture${i}: ${type};`)
@@ -216,6 +216,15 @@ class Layer {
         });
     }
 
+    hasExternalTexture(){
+
+        for (const texture of this.inputTextures){
+            if(texture instanceof GPUExternalTexture) return true;
+        }
+
+        return  false;
+    }
+
     run(){
 
 
@@ -223,7 +232,12 @@ class Layer {
 
         const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 
+
         pass.setPipeline(this.pipeline);
+
+        if(this.hasExternalTexture()){
+            this.bindGroup = this.defaultBindGroup();
+        }
 
         if(this.bindGroup) {
             pass.setBindGroup(0, this.bindGroup);

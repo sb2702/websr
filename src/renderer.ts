@@ -1,5 +1,6 @@
 import WebGPUContext from "./context";
 import NeuralNetwork from "./networks/base_network";
+import DisplayLayer from "./layers/anime4k/display";
 
 export default class WebSRRenderer{
     private context: WebGPUContext;
@@ -45,10 +46,9 @@ export default class WebSRRenderer{
     async renderStep(){
 
 
-        this.context.textures['output'] = this.context.context.getCurrentTexture();
+        const lastLayer = this.network.lastLayer();
 
-        this.network.layers[this.network.layers.length-1].outputTexture = this.context.textures['output'];
-
+        if(lastLayer instanceof DisplayLayer) lastLayer.setOutput(this.context.context.getCurrentTexture());
 
         await this.render();
 

@@ -80,7 +80,7 @@ class DisplayLayer extends Layer {
     }
 
 
-    createBindGroup(): GPUBindGroup{
+    defaultBindGroup(): GPUBindGroup {
 
 
         const entries: any[]  = [];
@@ -106,33 +106,13 @@ class DisplayLayer extends Layer {
 
     }
 
+    setOutput(outputTexture: GPUTexture){
 
-    run(){
-
-
-        const encoder = this.device.createCommandEncoder({label: this.label});
+        this.outputTexture = outputTexture;
 
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
-
-        const pass = encoder.beginRenderPass(this.renderPassDescriptor);
-
-        pass.setPipeline(this.pipeline);
-
-        this.bindGroup = this.createBindGroup();
-
-        pass.setBindGroup(0, this.bindGroup);
-
-
-        pass.draw(6);  // call our vertex shader 6 times
-        pass.end();
-
-        this.device.queue.submit([encoder.finish()]);
-
-
     }
     
-
-
 
 
 }

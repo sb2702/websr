@@ -84,7 +84,10 @@ class PixelShuffle2X extends Layer {
 
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }
-    
+
+
+
+
 
 
 
