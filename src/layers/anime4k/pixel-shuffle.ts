@@ -49,15 +49,15 @@ class PixelShuffle2X extends Layer {
 
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                   
-                    let x_floor  = u32(fract(input.tex_coord.x*640.0)*2.0);
+                    let x_floor  = u32(fract(input.tex_coord.x*${this.resolution.width}.0)*2.0);
                     
-                    let y_floor  = u32(fract(input.tex_coord.y*360.0)*2.0);
+                    let y_floor  = u32(fract(input.tex_coord.y*${this.resolution.height}.0)*2.0);
                     
                     //I don t know, I think this is right? I found this by trial and error
                     let c_index: u32 = x_floor + y_floor*2;  
               
-                    let x = i32(640.0*(input.tex_coord.x));
-                    let y = i32(360.0*(input.tex_coord.y));
+                    let x = i32(${this.resolution.width}.0*(input.tex_coord.x));
+                    let y = i32(${this.resolution.height}.0*(input.tex_coord.y));
                     
                     let value = textureLoad(featureMap, vec2<i32>(x, y), 0)[c_index];
                    
