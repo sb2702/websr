@@ -15,7 +15,7 @@ class Layer {
     renderPassDescriptor: GPURenderPassDescriptor;
     bindGroup: GPUBindGroup | null;
     label: string;
-    inputTextures: GPUTexture[];
+    inputTextures: (GPUTexture|GPUExternalTexture)[];
     outputTexture: GPUTexture;
     uniforms: Uniform[];
     weights: any;
@@ -23,7 +23,7 @@ class Layer {
     context: WebGPUContext;
     resolution: Resolution;
 
-    constructor(inputTextures: GPUTexture[], outputTexture:GPUTexture, weights?: any){
+    constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture:GPUTexture, weights?: any){
 
         this.context = globalThis.context;
         this.device = this.context.device;
@@ -125,6 +125,9 @@ class Layer {
 
     createStandardShader(fragmentShader: string): GPUShaderModule{
 
+        console.log(this.label);
+        console.log("This fragment shader");
+        console.log(this.fragmentShaderInputs());
 
         return  this.device.createShaderModule({
             label: `${this.label}-shader`,
@@ -148,7 +151,13 @@ class Layer {
         const inputs = [];
 
         for (let i=0; i < this.inputTextures.length; i++){
-            inputs.push(`@group(0) @binding(0) var inputTexture${i}: texture_2d<f32>;`)
+
+            if(this.label === "Anime4KConv3x4"){
+                console.log(this.inputTextures);
+            }
+            let type = (this.inputTextures[i] instanceof GPUTexture) ? 'texture_2d<f32>' : 'texture_external';
+
+            inputs.push(`@group(0) @binding(0) var inputTexture${i}: ${type};`)
         }
 
 
@@ -185,7 +194,13 @@ class Layer {
         const entries: any[]  = [];
 
         this.inputTextures.forEach(function (texture, i) {
-            entries.push({ binding: i, resource: texture.createView()})
+
+            if(texture instanceof GPUExternalTexture){
+                entries.push({ binding: i, resource: texture})
+            } else if (texture instanceof GPUTexture){
+                entries.push({ binding: i, resource: texture.createView()})
+            }
+
         });
 
 

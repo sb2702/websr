@@ -14,6 +14,7 @@ export default class WebGPUContext {
     context: GPUCanvasContext;
     textures: Record<string, GPUTexture>;
     resolution: Resolution;
+    input: GPUExternalTexture;
 
     debug: boolean;
     usage: number;
@@ -40,18 +41,6 @@ export default class WebGPUContext {
         this.usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
         if(this.debug) this.usage  = this.usage |  GPUTextureUsage.COPY_SRC;
         
-
-        const inputTexture = device.createTexture({
-            label: 'Input Image',
-            size: [resolution.width, resolution.height],
-            format: 'rgba8unorm',
-            usage: this.usage
-        });
-
-
-
-
-        this.textures['input'] = inputTexture;
 
 
         this.textures['output'] = this.context.getCurrentTexture();

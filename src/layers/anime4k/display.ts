@@ -5,7 +5,7 @@ class DisplayLayer extends Layer {
 
     label = "DisplayLayer"
 
-    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture){
+    constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture: GPUTexture){
         super(inputTextures, outputTexture)
 
 
@@ -46,7 +46,7 @@ class DisplayLayer extends Layer {
 
               
                @group(0) @binding(0) var pixelShuffle: texture_2d<f32>;
-               @group(0) @binding(1) var inputTexture: texture_2d<f32>;
+               @group(0) @binding(1) var inputTexture: texture_external;
                @group(0) @binding(2) var ourSampler: sampler;
               
                @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
@@ -57,7 +57,7 @@ class DisplayLayer extends Layer {
                     
                     let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
                     
-                    let bicubic = textureSample(inputTexture, ourSampler, input.tex_coord);
+                    let bicubic = textureSampleBaseClampToEdge(inputTexture, ourSampler, input.tex_coord);
                     
                     return bicubic + vec4f(value);
                 
@@ -77,23 +77,40 @@ class DisplayLayer extends Layer {
         this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
 
 
-
-        this.bindGroup = this.device.createBindGroup({
-            layout: this.pipeline.getBindGroupLayout(0),
-            entries: [
-
-                { binding: 0, resource: this.inputTextures[0].createView() },
-                { binding: 1, resource: this.inputTextures[1].createView() },
-                { binding: 2, resource: this.sampler }
-            ]
-        });
-
-
+       // this.bindGroup = this.createBindGroup();
 
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }
 
 
+    createBindGroup(): GPUBindGroup{
+
+
+        const entries: any[]  = [];
+
+
+        console.log("In Display layer");
+        console.log(this.inputTextures);
+        this.inputTextures.forEach(function (texture, i) {
+
+            if(texture instanceof GPUExternalTexture){
+                entries.push({ binding: i, resource: texture})
+            } else if (texture instanceof GPUTexture){
+                entries.push({ binding: i, resource: texture.createView()})
+            }
+
+        });
+
+        entries.push({ binding: this.inputTextures.length, resource: this.sampler })
+
+
+        return this.device.createBindGroup({
+            layout: this.pipeline.getBindGroupLayout(0),
+            entries
+        });
+
+
+    }
 
 
     run(){
@@ -107,20 +124,10 @@ class DisplayLayer extends Layer {
 
         pass.setPipeline(this.pipeline);
 
-        this.bindGroup = this.device.createBindGroup({
-            layout: this.pipeline.getBindGroupLayout(0),
-            entries: [
+        this.bindGroup = this.createBindGroup();
 
-                { binding: 0, resource: this.inputTextures[0].createView() },
-                { binding: 1, resource: this.inputTextures[1].createView() },
-                { binding: 2, resource: this.sampler }
-            ]
-        });
+        pass.setBindGroup(0, this.bindGroup);
 
-
-        if(this.bindGroup) {
-            pass.setBindGroup(0, this.bindGroup);
-        }
 
         pass.draw(6);  // call our vertex shader 6 times
         pass.end();
