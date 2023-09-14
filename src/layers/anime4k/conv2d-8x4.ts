@@ -6,8 +6,8 @@ class Anime4KConv8x4 extends Layer {
     label = "Anime4KConv8x4"
 
 
-    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture, weights: any){
-        super(device, inputTextures, outputTexture, weights)
+    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture, weights: any){
+        super(inputTextures, outputTexture, weights)
 
 
         const kernels: number[] = weights.weights;

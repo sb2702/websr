@@ -7,10 +7,11 @@ class NeuralNetwork {
     layers: Layer[];
     weights: any;
 
-    constructor(context: WebGPUContext, weights?: any) {
+    constructor(weights?: any) {
 
-        this.context = context;
+
         this.weights = weights;
+        this.context = globalThis.context;
         this.layers = this.model();
     }
 

@@ -5,8 +5,8 @@ class GuassianLayer extends Layer {
     label = "Gaussian"
 
 
-    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
-        super(device, inputTextures, outputTexture)
+    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture){
+        super(inputTextures, outputTexture)
 
 
         this.createUniform("gaussian", "array<vec3f, 3>");

@@ -6,8 +6,8 @@ class PixelShuffle2X extends Layer {
     label = "PixelShuffle2X"
 
 
-    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
-        super(device, inputTextures, outputTexture)
+    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture){
+        super(inputTextures, outputTexture)
 
 
 

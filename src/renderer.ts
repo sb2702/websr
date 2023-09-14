@@ -7,9 +7,9 @@ export default class WebSRRenderer{
 
 
 
-    constructor(context: WebGPUContext, network: NeuralNetwork) {
+    constructor(network: NeuralNetwork) {
 
-        this.context = context;
+        this.context = globalThis.context;
         this.network = network;
 
     }

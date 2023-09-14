@@ -10,6 +10,11 @@ export interface Resolution {
 }
 
 
+declare global {
+    var context: WebGPUContext;
+}
+
+
 export default class WebSR {
     canvas: HTMLCanvasElement;
     context: WebGPUContext;
@@ -25,11 +30,13 @@ export default class WebSR {
 
         this.context = new WebGPUContext(device, resolution,  canvas);
 
+        globalThis.context = this.context;
+
         if(!NetworkList[network_name]) throw Error(`Network ${network_name} is not defined or implemented`);
 
-        this.network = new NetworkList[network_name](this.context, weights);
+        this.network = new NetworkList[network_name](weights);
 
-        this.renderer = new WebSRRenderer(this.context, this.network);
+        this.renderer = new WebSRRenderer(this.network);
 
     }
 

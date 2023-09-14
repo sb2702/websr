@@ -1,3 +1,5 @@
+import WebGPUContext from "../context";
+import {Resolution} from "../main";
 
 interface Uniform {
     name: string,
@@ -18,9 +20,14 @@ class Layer {
     uniforms: Uniform[];
     weights: any;
     buffers: Record<string, GPUBuffer>;
+    context: WebGPUContext;
+    resolution: Resolution;
 
-    constructor(device:GPUDevice, inputTextures: GPUTexture[], outputTexture:GPUTexture, weights?: any){
-        this.device = device;
+    constructor(inputTextures: GPUTexture[], outputTexture:GPUTexture, weights?: any){
+
+        this.context = globalThis.context;
+        this.device = this.context.device;
+        this.resolution = this.context.resolution;
         this.inputTextures = inputTextures;
         this.outputTexture = outputTexture;
         this.uniforms =  [];
@@ -58,8 +65,8 @@ class Layer {
               vsOutput.position = vec4f(xy, 0.0, 1.0);
               vsOutput.tex_coord = xy*0.5 + 0.5;
               vsOutput.tex_coord.y = - 1.0* vsOutput.tex_coord.y  + 1.0;
-               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*640;
-               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*360;
+               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*${this.resolution.width};
+               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*${this.resolution.height};
               return vsOutput;
             }
         `

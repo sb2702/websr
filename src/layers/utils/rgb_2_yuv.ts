@@ -6,9 +6,9 @@ class RGB2YUV extends Layer {
     label: "RGB2YUV"
 
 
-    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
+    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture){
 
-        super(device, inputTextures, outputTexture)
+        super(inputTextures, outputTexture)
 
         this.createUniform("rgb2yuv", "mat3x3f");
 

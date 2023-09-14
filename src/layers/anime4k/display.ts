@@ -5,8 +5,8 @@ class DisplayLayer extends Layer {
 
     label = "DisplayLayer"
 
-    constructor(device: GPUDevice, inputTextures: GPUTexture[], outputTexture: GPUTexture){
-        super(device, inputTextures, outputTexture)
+    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture){
+        super(inputTextures, outputTexture)
 
 
 
