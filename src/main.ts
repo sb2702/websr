@@ -4,16 +4,26 @@ import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
 import {NetworkList, NetworkName} from "./networks/network_list";
 
+export interface Resolution {
+    width: number,
+    height: number
+}
+
+
 export default class WebSR {
     canvas: HTMLCanvasElement;
     context: WebGPUContext;
     network: NeuralNetwork;
     renderer: WebSRRenderer;
+    resolution: Resolution;
 
-    constructor(network_name: NetworkName, weights: any, device: GPUDevice,  canvas: HTMLCanvasElement) {
+
+    constructor(network_name: NetworkName, weights: any, device: GPUDevice,  resolution: Resolution, canvas: HTMLCanvasElement) {
 
         this.canvas = canvas;
-        this.context = new WebGPUContext(device, canvas);
+        this.resolution = resolution;
+
+        this.context = new WebGPUContext(device, resolution,  canvas);
 
         if(!NetworkList[network_name]) throw Error(`Network ${network_name} is not defined or implemented`);
 

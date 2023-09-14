@@ -1,3 +1,4 @@
+import {Resolution} from "./main";
 
 
 interface TextureOptions {
@@ -12,15 +13,17 @@ export default class WebGPUContext {
     device: GPUDevice;
     context: GPUCanvasContext;
     textures: Record<string, GPUTexture>;
+    resolution: Resolution;
 
     private debug: boolean;
     private usage: number;
 
 
-    constructor(device: GPUDevice, canvas: HTMLCanvasElement) {
+    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement) {
 
         this.device = device;
         this.canvas = canvas;
+        this.resolution = resolution;
         this.textures = {};
 
 
@@ -40,7 +43,7 @@ export default class WebGPUContext {
 
         const inputTexture = device.createTexture({
             label: 'Input Image',
-            size: [canvas.width/2, canvas.height/2],
+            size: [resolution.width, resolution.height],
             format: 'rgba8unorm',
             usage: this.usage
         });
@@ -117,7 +120,7 @@ export default class WebGPUContext {
 
             this.textures[key] = this.device.createTexture({
                 label: key,
-                size: [options.width || this.context.canvas.width/2, options.height || this.context.canvas.height/2],
+                size: [options.width || this.resolution.width, options.height || this.resolution.height],
                 format: options.format || 'rgba32float',
                 usage: this.usage
             });
