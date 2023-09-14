@@ -66,7 +66,7 @@ export default class WebSRRenderer{
             this.context.device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input')}, [image.width, image.height]);
         }
 
-        this.network.feedForward(this.video);
+        await this.network.feedForward(this.video);
     }
 
 

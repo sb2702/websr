@@ -112,7 +112,7 @@ class DisplayLayer extends Layer {
 
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }
-    
+
 
 
 }
