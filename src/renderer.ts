@@ -44,6 +44,12 @@ export default class WebSRRenderer{
 
     async renderStep(){
 
+
+        this.context.textures['output'] = this.context.context.getCurrentTexture();
+
+        this.network.layers[this.network.layers.length-1].outputTexture = this.context.textures['output'];
+
+
         await this.render();
 
         this.video.requestVideoFrameCallback(this.renderStep.bind(this));
@@ -58,10 +64,9 @@ export default class WebSRRenderer{
         if(this.video){
             let image = await createImageBitmap(this.video);
             this.context.device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input')}, [image.width, image.height]);
-            this.context.device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input2')}, [image.width, image.height]);
         }
 
-        this.network.feedForward();
+        this.network.feedForward(this.video);
     }
 
 

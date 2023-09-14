@@ -23,7 +23,7 @@ class NeuralNetwork {
         return [];
     }
 
-    feedForward(){
+    async feedForward(video?: HTMLVideoElement){
 
         this.layers.forEach(layer => {
             layer.run();

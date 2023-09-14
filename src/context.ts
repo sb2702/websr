@@ -15,8 +15,8 @@ export default class WebGPUContext {
     textures: Record<string, GPUTexture>;
     resolution: Resolution;
 
-    private debug: boolean;
-    private usage: number;
+    debug: boolean;
+    usage: number;
 
 
     constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement) {
@@ -49,18 +49,10 @@ export default class WebGPUContext {
         });
 
 
-        const inputTexture2 = device.createTexture({
-            label: 'Input Image',
-            size: [resolution.width, resolution.height],
-            format: 'rgba8unorm',
-            usage: this.usage
-        });
-
 
 
         this.textures['input'] = inputTexture;
 
-        this.textures['input2'] = inputTexture2;
 
         this.textures['output'] = this.context.getCurrentTexture();
 
