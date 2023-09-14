@@ -125,10 +125,6 @@ class Layer {
 
     createStandardShader(fragmentShader: string): GPUShaderModule{
 
-        console.log(this.label);
-        console.log("This fragment shader");
-        console.log(this.fragmentShaderInputs());
-
         return  this.device.createShaderModule({
             label: `${this.label}-shader`,
             code: `
@@ -151,10 +147,7 @@ class Layer {
         const inputs = [];
 
         for (let i=0; i < this.inputTextures.length; i++){
-
-            if(this.label === "Anime4KConv3x4"){
-                console.log(this.inputTextures);
-            }
+            
             let type = (this.inputTextures[i] instanceof GPUTexture) ? 'texture_2d<f32>' : 'texture_external';
 
             inputs.push(`@group(0) @binding(0) var inputTexture${i}: ${type};`)

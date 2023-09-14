@@ -76,9 +76,6 @@ class DisplayLayer extends Layer {
 
         this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
 
-
-       // this.bindGroup = this.createBindGroup();
-
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }
 
@@ -88,9 +85,6 @@ class DisplayLayer extends Layer {
 
         const entries: any[]  = [];
 
-
-        console.log("In Display layer");
-        console.log(this.inputTextures);
         this.inputTextures.forEach(function (texture, i) {
 
             if(texture instanceof GPUExternalTexture){

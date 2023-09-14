@@ -76,7 +76,7 @@ class PixelShuffle2X extends Layer {
             layout: this.pipeline.getBindGroupLayout(0),
             entries: [
 
-                { binding: 0, resource: this.inputTextures[0].createView() }
+                { binding: 0, resource: (<GPUTexture> this.inputTextures[0]).createView() }
             ]
         });
 

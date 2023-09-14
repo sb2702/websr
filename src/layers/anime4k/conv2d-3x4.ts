@@ -78,14 +78,8 @@ class Anime4KConv3x4 extends Layer {
 
         this.bindGroup = this.defaultBindGroup();
 
-        console.log("Bind grouo layout");
-        console.log(this.pipeline.getBindGroupLayout(0));
+        pass.setBindGroup(0, this.bindGroup);
 
-        console.log(this.bindGroup);
-
-        if(this.bindGroup) {
-            pass.setBindGroup(0, this.bindGroup);
-        }
 
         pass.draw(6);  // call our vertex shader 6 times
         pass.end();
