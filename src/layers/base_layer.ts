@@ -22,6 +22,7 @@ class Layer {
     buffers: Record<string, GPUBuffer>;
     context: WebGPUContext;
     resolution: Resolution;
+    vertexScale: Resolution;
 
     constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture:GPUTexture, weights?: any){
 
@@ -33,6 +34,7 @@ class Layer {
         this.uniforms =  [];
         this.buffers = {};
         this.weights = weights;
+        this.vertexScale = this.context.resolution;
     }
 
 
@@ -65,8 +67,8 @@ class Layer {
               vsOutput.position = vec4f(xy, 0.0, 1.0);
               vsOutput.tex_coord = xy*0.5 + 0.5;
               vsOutput.tex_coord.y = - 1.0* vsOutput.tex_coord.y  + 1.0;
-               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*${this.resolution.width};
-               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*${this.resolution.height};
+               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*${this.vertexScale.width};
+               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*${this.vertexScale.height};
               return vsOutput;
             }
         `
