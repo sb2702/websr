@@ -47,10 +47,20 @@ export default class WebGPUContext {
             format: 'rgba8unorm',
             usage: this.usage
         });
-        
+
+
+        const inputTexture2 = device.createTexture({
+            label: 'Input Image',
+            size: [resolution.width, resolution.height],
+            format: 'rgba8unorm',
+            usage: this.usage
+        });
+
 
 
         this.textures['input'] = inputTexture;
+
+        this.textures['input2'] = inputTexture2;
 
         this.textures['output'] = this.context.getCurrentTexture();
 

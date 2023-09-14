@@ -100,17 +100,15 @@
 
         console.log("Loaded WebSR", websr);
 
-        const bitmap = await createImageBitmap(video);
-
         console.log("Feeding bitmap into WebSR");
 
-        await websr.loadImage(bitmap);
+        await websr.loadVideo(video);
 
         console.log("Rendering");
 
-        await websr.render();
+        await websr.start();
 
-        video.pause();
+       // video.pause();
 
 
         const element = document.getElementById("image-compare");

@@ -55,6 +55,14 @@ export default class WebSR {
         return device;
     }
 
+    async loadVideo(video: HTMLVideoElement){
+        await this.renderer.loadVideo(video);
+    }
+
+    start (){
+        this.renderer.start();
+    }
+
     async loadImage(image: ImageBitmap){
         await this.renderer.loadImage(image);
     }
