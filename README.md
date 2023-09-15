@@ -27,7 +27,7 @@ yarn add @websr/websr
 ### Usage
 
 ```javascript
-import Websr from  '@websr/websr';
+import WebSR from  '@websr/websr';
 
 
 WebSR.initWebGPU().then(async function (gpu) {
