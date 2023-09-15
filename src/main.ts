@@ -5,6 +5,13 @@ import {NetworkList, NetworkName} from "./networks/network_list";
 import {Resolution} from "./utils";
 
 
+interface WebSRParams {
+    video: HTMLVideoElement,
+    canvas?: HTMLCanvasElement,
+    weights: any,
+    network_name: NetworkName,
+    gpu: GPUDevice
+}
 
 
 declare global {
@@ -21,24 +28,31 @@ export default class WebSR {
     video: HTMLVideoElement
 
 
-    constructor(video: HTMLVideoElement, network_name: NetworkName, weights: any, device: GPUDevice, canvas: HTMLCanvasElement) {
+    constructor(params: WebSRParams) {
 
-        this.canvas = canvas;
-        this.video = video;
+        this.video = params.video;
 
         // We should make this dynamic
         this.resolution = {
-            width: video.videoWidth,
-            height: video.videoHeight
+            width: this.video.videoWidth,
+            height: this.video.videoHeight
         };
 
-        this.context = new WebGPUContext(device, this.resolution,  canvas);
+        if(params.canvas) this.canvas = params.canvas;
+        else  {
+            this.canvas = new HTMLCanvasElement();
+            this.canvas.width = this.resolution.width*2;
+            this.canvas.height = this.resolution.height*2;
+
+        }
+
+        this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas);
 
         globalThis.context = this.context;
 
-        if(!NetworkList[network_name]) throw Error(`Network ${network_name} is not defined or implemented`);
+        if(!NetworkList[params.network_name]) throw Error(`Network ${params.network_name} is not defined or implemented`);
 
-        this.network = new NetworkList[network_name](weights);
+        this.network = new NetworkList[params.network_name](params.weights);
 
         this.renderer = new WebSRRenderer(this.network, this.video);
 
