@@ -1,0 +1,13 @@
+import NeuralNetwork from "./networks/base_network";
+export default class WebSRRenderer {
+    private context;
+    private network;
+    video: HTMLVideoElement;
+    active: boolean;
+    vfc: number;
+    constructor(network: NeuralNetwork, video: HTMLVideoElement);
+    start(): Promise<void>;
+    stop(): Promise<void>;
+    renderStep(): Promise<void>;
+    render(): Promise<void>;
+}
