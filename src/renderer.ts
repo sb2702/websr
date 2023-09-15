@@ -7,40 +7,33 @@ export default class WebSRRenderer{
     private network: NeuralNetwork;
 
     video: HTMLVideoElement;
+    active: boolean;
+    vfc: number;
 
 
 
-    constructor(network: NeuralNetwork) {
+    constructor(network: NeuralNetwork, video: HTMLVideoElement) {
 
         this.context = globalThis.context;
         this.network = network;
 
-    }
-
-
-    async loadVideo(video: HTMLVideoElement){
-
-
         this.video = video;
 
-        let image = await createImageBitmap(this.video);
-        this.context.device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input')}, [image.width, image.height]);
+        this.active = false;
 
     }
 
 
-    loadImage(image: ImageBitmap){
 
-        const device  = this.context.device;
-
-        device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input')}, [image.width, image.height]);
+    async start(){
+        this.active = true;
+        await this.renderStep();
 
     }
 
-
-    start(){
-
-        this.renderStep();
+    async stop(){
+        this.active = false;
+        if(this.vfc) this.video.cancelVideoFrameCallback(this.vfc);
     }
 
     async renderStep(){
@@ -52,7 +45,9 @@ export default class WebSRRenderer{
 
         await this.render();
 
-        this.video.requestVideoFrameCallback(this.renderStep.bind(this));
+        if(this.active) {
+            this.vfc = this.video.requestVideoFrameCallback(this.renderStep.bind(this));
+        }
 
     }
 
@@ -60,12 +55,6 @@ export default class WebSRRenderer{
 
 
     async render(){
-
-        if(this.video){
-            let image = await createImageBitmap(this.video);
-            this.context.device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input')}, [image.width, image.height]);
-        }
-
         await this.network.feedForward(this.video);
     }
 

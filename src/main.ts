@@ -21,14 +21,21 @@ export default class WebSR {
     network: NeuralNetwork;
     renderer: WebSRRenderer;
     resolution: Resolution;
+    video: HTMLVideoElement
 
 
-    constructor(network_name: NetworkName, weights: any, device: GPUDevice,  resolution: Resolution, canvas: HTMLCanvasElement) {
+    constructor(video: HTMLVideoElement, network_name: NetworkName, weights: any, device: GPUDevice, canvas: HTMLCanvasElement) {
 
         this.canvas = canvas;
-        this.resolution = resolution;
+        this.video = video;
 
-        this.context = new WebGPUContext(device, resolution,  canvas);
+        // We should make this dynamic
+        this.resolution = {
+            width: video.videoWidth,
+            height: video.videoHeight
+        };
+
+        this.context = new WebGPUContext(device, this.resolution,  canvas);
 
         globalThis.context = this.context;
 
@@ -36,7 +43,7 @@ export default class WebSR {
 
         this.network = new NetworkList[network_name](weights);
 
-        this.renderer = new WebSRRenderer(this.network);
+        this.renderer = new WebSRRenderer(this.network, this.video);
 
     }
 
@@ -55,21 +62,11 @@ export default class WebSR {
         return device;
     }
 
-    async loadVideo(video: HTMLVideoElement){
-        await this.renderer.loadVideo(video);
-    }
 
     start (){
         this.renderer.start();
     }
-
-    async loadImage(image: ImageBitmap){
-        await this.renderer.loadImage(image);
-    }
-
-    async render(){
-        await this.renderer.render()
-    }
+    
 
 
 }

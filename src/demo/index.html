@@ -87,7 +87,6 @@
 
         video.currentTime = 3;
 
-
         await new Promise(function (resolve, reject) {
             setTimeout(resolve, 100);
         });
@@ -96,19 +95,14 @@
 
         const weights = await (await fetch('./anime4k-cnn-2x-s.json')).json()
 
-        const websr = new WebSR("anime4k/cnn-2x-s", weights,  gpu, {width: 640, height: 360},  canvas);
+        const websr = new WebSR(video, "anime4k/cnn-2x-s", weights,  gpu,  canvas);
 
         console.log("Loaded WebSR", websr);
-
-        console.log("Feeding bitmap into WebSR");
-
-        await websr.loadVideo(video);
+        
 
         console.log("Rendering");
 
         await websr.start();
-
-       // video.pause();
 
 
         const element = document.getElementById("image-compare");
