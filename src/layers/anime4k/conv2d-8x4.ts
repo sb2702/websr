@@ -12,7 +12,7 @@ class Anime4KConv8x4 extends Layer {
 
         const kernels: number[] = weights.weights;
         const bias: number[] = weights.bias;
-        
+
         this.createUniform("kernel_offsets", "array<vec4f, 9>");
         this.createUniform("kernels", "array<mat4x4f, 18>");
         this.createUniform("bias", "vec4f");

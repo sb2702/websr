@@ -1,13 +1,10 @@
-
 import WebGPUContext from './context'
 import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
 import {NetworkList, NetworkName} from "./networks/network_list";
+import {Resolution} from "./utils";
 
-export interface Resolution {
-    width: number,
-    height: number
-}
+
 
 
 declare global {
@@ -66,7 +63,7 @@ export default class WebSR {
     start (){
         this.renderer.start();
     }
-    
+
 
 
 }

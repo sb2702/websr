@@ -55,9 +55,6 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
            layer.run();
         });
 
-
-        //
-
     }
 
 
