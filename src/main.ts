@@ -74,8 +74,17 @@ export default class WebSR {
     }
 
 
-    start (){
-        this.renderer.start();
+    async start (){
+        await this.renderer.start();
+    }
+
+    async stop(){
+        await this.renderer.stop();
+    }
+
+    async destroy(){
+        await this.renderer.stop();
+        this.context.destroy();
     }
 
 

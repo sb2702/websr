@@ -26,6 +26,11 @@ export default class WebSRRenderer{
 
 
     async start(){
+
+        if(this.context.destroyed) {
+            throw new Error("WebSR instance was destroyed");
+        }
+
         this.active = true;
         await this.renderStep();
 

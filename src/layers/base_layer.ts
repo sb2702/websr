@@ -1,5 +1,5 @@
 import WebGPUContext from "../context";
-import {Resolution} from "../main";
+import {Resolution} from "../utils";
 
 interface Uniform {
     name: string,

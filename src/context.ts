@@ -1,4 +1,4 @@
-import {Resolution} from "./main";
+import {Resolution} from "./utils";
 
 
 interface TextureOptions {
@@ -15,6 +15,7 @@ export default class WebGPUContext {
     textures: Record<string, GPUTexture>;
     resolution: Resolution;
     input: GPUExternalTexture;
+    destroyed: boolean;
 
     debug: boolean;
     usage: number;
@@ -26,6 +27,7 @@ export default class WebGPUContext {
         this.canvas = canvas;
         this.resolution = resolution;
         this.textures = {};
+        this.destroyed = false;
 
 
         this.context = this.canvas.getContext('webgpu');
@@ -102,6 +104,10 @@ export default class WebGPUContext {
         return  new Float32Array(0);
     }
 
+    destroy(){
+        this.device.destroy();
+        this.destroyed = true;
+    }
 
     texture(key:string, options?: TextureOptions): GPUTexture {
 
