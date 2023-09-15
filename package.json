@@ -2,8 +2,8 @@
   "name": "@sb2702/websr",
   "version": "0.0.1",
   "description": "A free and open-source Javascript library / SDK for running practical, real-time AI Upscaling of videos and images on the web.",
-  "main": "dist/websr.js",
-  "types": "dist/main.d.ts",
+  "main": "./dist/websr.js",
+  "types": "./dist/main.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "demo": "webpack --config webpack.demo.config.js",
