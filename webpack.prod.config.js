@@ -6,6 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     entry: [ "./src/main.ts"],
+    mode: 'production',
     output: {
         library: "WebSR",
         libraryTarget: "umd",

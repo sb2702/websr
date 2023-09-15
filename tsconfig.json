@@ -2,7 +2,12 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "target": "ES2015",
-    "module": "ES2015",
-    "types": ["@webgpu/types"]
-  }
+    "module": "commonjs",
+    "lib": [ "es2015", "dom" ],
+    "types": ["@webgpu/types"],
+    "outDir": "dist",
+    "sourceMap": true,
+    "declaration": true
+  },
+
 }
