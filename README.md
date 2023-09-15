@@ -61,17 +61,17 @@ WebSR.initWebGPU().then(async function (gpu) {
 
 
 
-** Coming very soon **
+**Coming very soon**
 - [ ] Performance tests
 - [ ] Provide notebook and scripts for writing and training custom networks
 - [ ] Automated builds & tests
 
-** Coming soon-ish**
+**Coming soon-ish**
 - [ ] Re-implement with compute shaders for better performance
 - [ ] Provide lower level control for developers
 
 
-** Want to get around to **
+**Want to get around to**
 - [ ] Add more upscaling networks
 - [ ] Write a chrome plug-in optimizing to implement this easily
 - [ ] Build a static website to upscale videos on your device for free
