@@ -4,6 +4,10 @@ A free and open-source Javascript library / SDK for running practical, real-time
 
 <img width="640" title="Demo clip from Hero by the Blender Foundation, licensed under Creative Commons 4.0 Attribution licensed" alt="Demo clip from Hero by the Blender Foundation, licensed under Creative Commons 4.0 Attribution licensed" src="https://github.com/sb2702/websr/assets/5678502/82e6e764-89f4-4c8d-b8f6-dcd43d43c0f3">
 
+
+[Check out the demo!](https://sb2702-files.s3.amazonaws.com/ml/demos/index.html)
+
+
 **Warning**
 This project is very new and still in development, and shouldn't be used (yet) in production until stable. Expect API changes between versions and bugs
 
