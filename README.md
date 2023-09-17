@@ -62,6 +62,7 @@ If the goal is to run super resolution on a video at 30 frames per second on mid
 
 WebSR is an attempt to take on this challenge, and make super resolution practical in the browser. By taking advantage of the fact that super-resolution has proved relatively better at improving the video quality of Anime, Cartoons and Screen-sharing content, as well the faster graphics computation enabled by [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API), WebSR should be just-about practical enough for production video and WebRTC applicaitons in cases where bandwidth or video quality is an issue.
 
+See [this video](https://www.youtube.com/watch?v=R6Ly0GYlXa4) for more info on super resolution on the web.
 
 ### How it works
 
