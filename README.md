@@ -77,7 +77,7 @@ While there are many super-resolution networks and algorithms available, for a p
 
 This repo provides the [default production weights](https://github.com/sb2702/websr/blob/main/weights/anime4k/cnn-2x-s.json) asociated with the `cnn-2x-s` network directly from Anime4K. 
 
-You can custom train or fine-tune the network and generate your own weights (details to follow).
+You can custom train or fine-tune the network and generate your own weights - see the notebooks in the `custom-training/` folder for details.
 
 The plan is to add additional neural networks, whether from other open-source projects or building custom networks specifically for WebSR.
 
@@ -91,7 +91,6 @@ The plan is to add additional neural networks, whether from other open-source pr
 
 **Very soon**
 - [ ] Performance tests
-- [ ] Provide notebook and scripts for writing and training custom networks
 - [ ] Automated builds & tests
 
 **Soon-ish**
