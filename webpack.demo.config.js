@@ -39,7 +39,7 @@ module.exports = {
     plugins: [
 
         new HtmlWebpackPlugin({
-            template: 'src/demo/index.html'
+            template: 'src/demo/test.html'
         }),
 
         new CleanWebpackPlugin({
@@ -67,7 +67,7 @@ module.exports = {
             directory: path.join(__dirname, 'demo'),
         },
         compress: true,
-        port: 8000,
+        port: 8080,
     },
 
     mode: 'development'
