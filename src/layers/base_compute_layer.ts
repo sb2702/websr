@@ -39,7 +39,7 @@ class ComputeLayer extends Layer {
             } else if (this.inputs[i] instanceof GPUTexture){
                 inputs.push(`@group(0) @binding(${i}) var inputTexture${i}: texture_external;`)
             } else if(this.inputs[i] instanceof GPUBuffer) {
-                inputs.push(`@group(0) @binding(${i}) var<storage, read_write> inputBuffer${i}: array<vec4f>`)
+                inputs.push(`@group(0) @binding(${i}) var<storage, read_write> inputBuffer${i}: array<vec4f>;`)
             } else {
                 throw new Error("Input is undefined or non of the correct input type");
             }
@@ -72,6 +72,13 @@ class ComputeLayer extends Layer {
             },
         }
 
+    }
+
+    defaultSetup(){
+
+        this.pipeline = this.device.createComputePipeline(this.defaultPipelineConfig());
+
+        this.bindGroup = this.defaultBindGroup();
     }
 
 

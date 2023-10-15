@@ -1,13 +1,13 @@
-import RenderLayer from "../base_render_layer";
+import ComputeLayer from "../base_compute_layer";
 
 
-class Anime4KConv8x4 extends RenderLayer {
+class Anime4KConv8x4 extends ComputeLayer {
 
     label = "Anime4KConv8x4"
 
 
-    constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture, weights: any){
-        super(inputTextures, outputTexture, weights)
+    constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any){
+        super(inputs, outputBuffer, weights)
 
 
         const kernels: number[] = weights.weights;
@@ -19,25 +19,31 @@ class Anime4KConv8x4 extends RenderLayer {
 
         this.shader = this.createStandardShader(`
         
-                  @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
-                  
-                     var result  = vec4f(0.0, 0.0, 0.0, 0.0);
+          @compute @workgroup_size(1, 1) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
+          
+                let x = id.x;
+                let y = id.y;
+                
+                let i = id.y*256 + x;
+                var result  = vec4f(0.0, 0.0, 0.0, 0.0);
+                
+                let coord = vec2<i32>( i32(x), i32(y));
                       
-                     for(var i = 0u; i < 9; i++){
-                       result += kernels[i]*max(textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy),0) , vec4f(0.0));
-                    }
-                    
-                     for(var i = 0u; i < 9; i++){
-                       result += kernels[i+9]*max(-1.0*textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy), 0), vec4f(0.0));
-                    }  
-                    
-                    result += bias;
+                 for(var i = 0u; i < 9; i++){
+                   let pixel_loc = coord + vec2<i32>(kernel_offsets[i].xy);
+                   let buff_ind = pixel_loc.y*256 + pixel_loc.x;
+                   
+                   let pix_val = inputBuffer0[buff_ind];
                   
+                   result += kernels[i]*max(pix_val, vec4f(0.0));
+                   result += kernels[i+9]*max(-1.0*pix_val, vec4f(0.0));
+                 } 
                     
-                    return result;
-                  }                 
+                result += bias;
+                
+                outputBuffer[i] = result;
+          }
         `);
-
 
         this.setUniform("kernel_offsets",  new Float32Array([
             -1,  -1, 0, 0,
