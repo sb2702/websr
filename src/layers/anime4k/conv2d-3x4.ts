@@ -43,7 +43,7 @@ class Anime4KConv3x4 extends ComputeLayer {
 
         const textureLoad = externalTexture ? 'textureLoad(inputTexture0, coord + offset)' :
             'textureLoad(inputTexture0, coord + offset, 0)';
-        
+
         this.shader = this.createStandardShader(`
         
           @compute @workgroup_size(1, 1) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
