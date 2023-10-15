@@ -1,7 +1,8 @@
 import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
 
-class Anime4KConv8x4 extends Layer {
+class Anime4KConv8x4 extends RenderLayer {
 
     label = "Anime4KConv8x4"
 

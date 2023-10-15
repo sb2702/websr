@@ -1,10 +1,9 @@
-import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
 
-class Anime4KConv3x4 extends Layer {
+class Anime4KConv3x4 extends RenderLayer {
 
     label = "Anime4KConv3x4"
-    private fragmentShaderCode: string;
 
     constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture: GPUTexture, weights: any){
         super(inputTextures, outputTexture, weights)

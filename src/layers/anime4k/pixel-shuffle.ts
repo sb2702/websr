@@ -1,7 +1,8 @@
 import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
 
-class PixelShuffle2X extends Layer {
+class PixelShuffle2X extends RenderLayer {
 
     label = "PixelShuffle2X"
 

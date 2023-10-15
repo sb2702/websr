@@ -1,7 +1,7 @@
-import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
 
-class DummyLayer extends Layer {
+class DummyLayer extends RenderLayer {
 
     label = "Dummy"
 

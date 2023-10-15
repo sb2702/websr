@@ -1,7 +1,8 @@
 import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
 
-class DisplayLayer extends Layer {
+class DisplayLayer extends RenderLayer {
 
     label = "DisplayLayer"
 
