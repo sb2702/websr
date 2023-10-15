@@ -1,4 +1,3 @@
-import RenderLayer from "../base_render_layer";
 import ComputeLayer from "../base_compute_layer";
 
 

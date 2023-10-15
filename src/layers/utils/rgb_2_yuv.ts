@@ -1,7 +1,8 @@
 import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
 
-class RGB2YUV extends Layer {
+class RGB2YUV extends RenderLayer {
 
     label: "RGB2YUV"
 

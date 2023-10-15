@@ -1,4 +1,3 @@
-import Layer from "../base_layer";
 import RenderLayer from "../base_render_layer";
 
 

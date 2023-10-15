@@ -1,6 +1,7 @@
 import Layer from "../base_layer";
+import RenderLayer from "../base_render_layer";
 
-class GuassianLayer extends Layer {
+class GuassianLayer extends RenderLayer {
 
     label = "Gaussian"
 
