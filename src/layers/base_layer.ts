@@ -10,7 +10,7 @@ class Layer {
 
     device: GPUDevice;
     shader: GPUShaderModule;
-    pipeline: GPURenderPipeline;
+    pipeline: GPURenderPipeline | GPUComputePipeline;
     sampler: GPUSampler;
     renderPassDescriptor: GPURenderPassDescriptor;
     bindGroup: GPUBindGroup | null;
@@ -86,6 +86,21 @@ class Layer {
                 }
             )
         });
+
+        if(this.output instanceof GPUBuffer){
+
+            entries.push(
+                {
+                    binding: this.inputs.length + this.uniforms.length,
+                    resource: {
+                        buffer: this.output
+                    }
+                }
+            )
+
+        }
+
+        console.log(entries);
 
         if(entries.length === 0) return  null;
 

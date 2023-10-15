@@ -6,9 +6,11 @@ import Layer from "./base_layer";
 class RenderLayer extends Layer {
 
     vertexScale: Resolution;
+    output: GPUTexture;
+    pipeline: GPURenderPipeline;
 
-    constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture:GPUTexture, weights?: any){
-        super(inputTextures, outputTexture, weights);
+    constructor(inputs: (GPUTexture|GPUExternalTexture)[], output:GPUTexture, weights?: any){
+        super(inputs, output, weights);
         this.vertexScale = this.context.resolution;
     }
 
@@ -62,7 +64,7 @@ class RenderLayer extends Layer {
             fragment: {
                 module: this.shader,
                 entryPoint: 'fragmentMain',
-                targets: [{format: this.outputTexture.format}],
+                targets: [{format: this.output.format}],
             },
         }
 
@@ -83,7 +85,7 @@ class RenderLayer extends Layer {
             label: `${this.label}-render-pass`,
             colorAttachments: [
                 {
-                    view:  this.outputTexture.createView(),
+                    view:  this.output.createView(),
                     clearValue: [0, 0, 0, 1],
                     loadOp: 'clear',
                     storeOp: 'store',
@@ -106,9 +108,6 @@ class RenderLayer extends Layer {
               ${fragmentShader}
         `
         });
-
-
-
     }
 
 
@@ -116,9 +115,9 @@ class RenderLayer extends Layer {
 
         const inputs = [];
 
-        for (let i=0; i < this.inputTextures.length; i++){
+        for (let i=0; i < this.inputs.length; i++){
 
-            let type = (this.inputTextures[i] instanceof GPUTexture) ? 'texture_2d<f32>' : 'texture_external';
+            let type = (this.inputs[i] instanceof GPUTexture) ? 'texture_2d<f32>' : 'texture_external';
 
             inputs.push(`@group(0) @binding(0) var inputTexture${i}: ${type};`)
         }
@@ -126,78 +125,12 @@ class RenderLayer extends Layer {
 
         this.uniforms.forEach((uniform,i)=>{
             inputs.push(
-                `@group(0) @binding(${i+this.inputTextures.length}) var <uniform> ${uniform.name}: ${uniform.type};`,
+                `@group(0) @binding(${i+this.inputs.length}) var <uniform> ${uniform.name}: ${uniform.type};`,
             )
         });
 
 
         return inputs.join('\n');
-
-    }
-
-
-    setUniform(name: string, value: Float32Array)  {
-
-        const buffer= this.device.createBuffer({
-            label: `layer-${this.label}-buffer-${name}`,
-            size: value.byteLength,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-        });
-
-
-        this.device.queue.writeBuffer(buffer, /*bufferOffset=*/0, value);
-
-        this.buffers[name] = buffer;
-
-
-    }
-
-
-    defaultBindGroup(){
-
-        const entries: any[]  = [];
-
-        this.inputTextures.forEach(function (texture, i) {
-
-
-            if(texture instanceof GPUExternalTexture){
-                entries.push({ binding: i, resource: texture})
-            } else if (texture instanceof GPUTexture){
-                entries.push({ binding: i, resource: texture.createView()})
-            }
-
-        });
-
-
-        this.uniforms.forEach((uniform, i)=>{
-            entries.push(
-                {
-                    binding: i+this.inputTextures.length,
-                    resource: {
-                        buffer: this.buffers[uniform.name]
-                    }
-                }
-            )
-        });
-
-        if(entries.length === 0) return  null;
-
-         return this.device.createBindGroup({
-            layout: this.pipeline.getBindGroupLayout(0),
-            entries
-        });
-    }
-
-    hasExternalTexture(){
-
-        for (const texture of this.inputTextures){
-            if(texture instanceof GPUExternalTexture) return true;
-        }
-
-        return  false;
-    }
-
-    lazyLoadSetup(){
 
     }
 
