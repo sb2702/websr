@@ -84,13 +84,16 @@ export default class WebGPUContext {
             usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST
         });
 
+
         readEncoder.copyBufferToBuffer(buffer, 0, resultBuffer, 0, resultBuffer.size);
 
         this.device.queue.submit([readEncoder.finish()]);
 
         await resultBuffer.mapAsync(GPUMapMode.READ);
 
-        return  new Float32Array(resultBuffer.getMappedRange());
+        let range = resultBuffer.getMappedRange();
+
+        return  new Float32Array(range);
 
     }
 
@@ -161,10 +164,11 @@ export default class WebGPUContext {
 
             options = options || {};
 
-            const width = options.width | this.resolution.width;
-            const height = options.height | this.resolution.height;
-            const channels = options.channels | 4;
-            const bitdepth = options.bitdepth | 4;
+            const width = options.width || this.resolution.width;
+            const height = options.height || this.resolution.height;
+            const channels = options.channels || 4;
+            const bitdepth = options.bitdepth || 4;
+
 
 
             this.buffers[key] = this.device.createBuffer({
@@ -172,6 +176,7 @@ export default class WebGPUContext {
                 size: width*height*channels*bitdepth,
                 usage: this.bufferUsage
             });
+            
 
         }
 
