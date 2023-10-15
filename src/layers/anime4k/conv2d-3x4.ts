@@ -4,9 +4,9 @@ import Layer from "../base_layer";
 class Anime4KConv3x4 extends Layer {
 
     label = "Anime4KConv3x4"
+    private fragmentShaderCode: string;
 
-
-    constructor(inputTextures: GPUExternalTexture[], outputTexture: GPUTexture, weights: any){
+    constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture: GPUTexture, weights: any){
         super(inputTextures, outputTexture, weights)
 
 
@@ -18,28 +18,7 @@ class Anime4KConv3x4 extends Layer {
         this.createUniform("kernels", "array<mat4x4f, 9>");
         this.createUniform("bias", "vec4f");
 
-
-
-
-        this.shader = this.createStandardShader(`
-        
-                  @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
-                  
-                     var result  = vec4f(0.0, 0.0, 0.0, 0.0);
-                      
-                     for(var i = 0u; i < 9; i++){
-                       result += kernels[i]*textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy));
-                    } 
-                    
-                    result += bias;
-                  
-                    
-                    return result;
-                  }                 
-        `);
-
-
-
+        // Set up pipeline in Lazy Load
 
         this.setUniform("kernel_offsets",  new Float32Array([
             -1,  -1, 0, 0,
@@ -57,14 +36,40 @@ class Anime4KConv3x4 extends Layer {
         this.setUniform("kernels",  new Float32Array(kernels));
         this.setUniform("bias",  new Float32Array(bias));
 
+    }
+
+    lazyLoadSetup(){
 
 
-        this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
+        const externalTexture = this.inputTextures[0] instanceof GPUExternalTexture;
 
+        const textureLoad = externalTexture ? 'textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy));' :
+            'textureLoad(inputTexture0, vec2<i32>(input.tex_coord + kernel_offsets[i].xy), 0);';
+
+
+        this.shader = this.createStandardShader(`
+        
+                  @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
+                  
+                     var result  = vec4f(0.0, 0.0, 0.0, 0.0);
+                      
+                     for(var i = 0u; i < 9; i++){
+                       result += kernels[i]*${textureLoad}
+                    } 
+                    
+                    result += bias;
+                  
+                    
+                    return result;
+                  }                 
+        `);
+
+
+        this.pipeline =  this.device.createRenderPipeline(this.defaultPipelineConfig());
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
 
-
     }
+
 
     run(){
 
@@ -72,7 +77,15 @@ class Anime4KConv3x4 extends Layer {
 
         const encoder = this.device.createCommandEncoder({label: this.label});
 
+        if(!this.pipeline) {
+
+            this.lazyLoadSetup();
+
+        }
+
         const pass = encoder.beginRenderPass(this.renderPassDescriptor);
+
+
 
         pass.setPipeline(this.pipeline);
 

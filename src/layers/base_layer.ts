@@ -162,6 +162,7 @@ class Layer {
             )
         });
 
+
         return inputs.join('\n');
 
     }
@@ -189,6 +190,7 @@ class Layer {
         const entries: any[]  = [];
 
         this.inputTextures.forEach(function (texture, i) {
+
 
             if(texture instanceof GPUExternalTexture){
                 entries.push({ binding: i, resource: texture})
@@ -236,6 +238,7 @@ class Layer {
 
 
         pass.setPipeline(this.pipeline);
+
 
         if(this.hasExternalTexture()){
             this.bindGroup = this.defaultBindGroup();

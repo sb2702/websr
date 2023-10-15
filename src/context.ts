@@ -14,7 +14,7 @@ export default class WebGPUContext {
     context: GPUCanvasContext;
     textures: Record<string, GPUTexture>;
     resolution: Resolution;
-    input: GPUExternalTexture;
+    input: GPUTexture | GPUExternalTexture;
     destroyed: boolean;
 
     debug: boolean;
