@@ -6,18 +6,18 @@ export default class WebSRRenderer{
     private context: WebGPUContext;
     private network: NeuralNetwork;
 
-    video: HTMLVideoElement;
+    source: HTMLVideoElement | HTMLImageElement;
     active: boolean;
     vfc: number;
 
 
 
-    constructor(network: NeuralNetwork, video: HTMLVideoElement) {
+    constructor(network: NeuralNetwork, source: HTMLVideoElement | HTMLImageElement) {
 
         this.context = globalThis.context;
         this.network = network;
 
-        this.video = video;
+        this.source = source;
 
         this.active = false;
 
@@ -38,7 +38,7 @@ export default class WebSRRenderer{
 
     async stop(){
         this.active = false;
-        if(this.vfc) this.video.cancelVideoFrameCallback(this.vfc);
+        if(this.vfc && this.source instanceof HTMLVideoElement) this.source.cancelVideoFrameCallback(this.vfc);
     }
 
     async renderStep(){
@@ -50,8 +50,8 @@ export default class WebSRRenderer{
 
         await this.render();
 
-        if(this.active) {
-            this.vfc = this.video.requestVideoFrameCallback(this.renderStep.bind(this));
+        if(this.active && this.source instanceof HTMLVideoElement) {
+            this.vfc = this.source.requestVideoFrameCallback(this.renderStep.bind(this));
         }
 
     }
@@ -60,7 +60,7 @@ export default class WebSRRenderer{
 
 
     async render(){
-        await this.network.feedForward(this.video);
+        await this.network.feedForward(this.source);
     }
 
 

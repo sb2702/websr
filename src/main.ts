@@ -6,7 +6,7 @@ import {Resolution} from "./utils";
 
 
 interface WebSRParams {
-    video: HTMLVideoElement,
+    source: HTMLVideoElement | HTMLImageElement,
     canvas?: HTMLCanvasElement,
     weights: any,
     network_name: NetworkName,
@@ -25,17 +25,19 @@ export default class WebSR {
     network: NeuralNetwork;
     renderer: WebSRRenderer;
     resolution: Resolution;
-    video: HTMLVideoElement
+    source: HTMLVideoElement | HTMLImageElement
 
 
     constructor(params: WebSRParams) {
 
-        this.video = params.video;
+        this.source = params.source;
+
+        const source = this.source;
 
         // We should make this dynamic
         this.resolution = {
-            width: this.video.videoWidth,
-            height: this.video.videoHeight
+            width: (source instanceof HTMLVideoElement) ? source.videoWidth : source.naturalWidth,
+            height: (source instanceof HTMLVideoElement) ? source.videoHeight : source.naturalHeight,
         };
 
         if(params.canvas) this.canvas = params.canvas;
@@ -54,7 +56,7 @@ export default class WebSR {
 
         this.network = new NetworkList[params.network_name](params.weights);
 
-        this.renderer = new WebSRRenderer(this.network, this.video);
+        this.renderer = new WebSRRenderer(this.network, this.source);
 
     }
 
