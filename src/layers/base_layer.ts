@@ -229,10 +229,15 @@ class Layer {
         return  false;
     }
 
+    lazyLoadSetup(){
+
+    }
+
     run(){
 
-
         const encoder = this.device.createCommandEncoder({label: this.label});
+
+        if(!this.pipeline) this.lazyLoadSetup();
 
         const pass = encoder.beginRenderPass(this.renderPassDescriptor);
 

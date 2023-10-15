@@ -78,9 +78,7 @@ class Anime4KConv3x4 extends Layer {
         const encoder = this.device.createCommandEncoder({label: this.label});
 
         if(!this.pipeline) {
-
             this.lazyLoadSetup();
-
         }
 
         const pass = encoder.beginRenderPass(this.renderPassDescriptor);

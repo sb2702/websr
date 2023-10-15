@@ -14,31 +14,6 @@ class DisplayLayer extends Layer {
         };
 
 
-        this.shader = this.device.createShaderModule({
-            label: `${this.label}-shader`,
-            code: `
-            
-               ${this.defaultVertexShader()}
-              
-               @group(0) @binding(0) var pixelShuffle: texture_2d<f32>;
-               @group(0) @binding(1) var inputTexture: texture_2d<f32>;
-               @group(0) @binding(2) var ourSampler: sampler;
-              
-               @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
-                  
-              
-                    let x = i32(${this.resolution.width*2}.0*(input.tex_coord.x));
-                    let y = i32(${this.resolution.height*2}.0*(input.tex_coord.y));
-                    
-                    let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
-                    
-                    let bicubic = textureSampleBaseClampToEdge(inputTexture, ourSampler, input.tex_coord);
-                    
-                    return bicubic + vec4f(value);
-                
-                  }            
-        `
-        });
 
         this.sampler =  this.device.createSampler({
             addressModeU: "repeat",
@@ -49,12 +24,49 @@ class DisplayLayer extends Layer {
         });
 
 
-        this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
-
-        this.bindGroup = this.defaultBindGroup();
-
-        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }
+
+
+    lazyLoadSetup(){
+
+
+        const externalTexture = this.inputTextures[1] instanceof GPUExternalTexture;
+
+        const textureLoad = externalTexture ? 'textureSampleBaseClampToEdge(inputTexture, ourSampler, input.tex_coord)' :
+            'textureSample(inputTexture, ourSampler, input.tex_coord)';
+
+        this.shader = this.device.createShaderModule({
+                label: `${this.label}-shader`,
+                code: `
+                
+                   ${this.defaultVertexShader()}
+                  
+                   @group(0) @binding(0) var pixelShuffle: texture_2d<f32>;
+                   @group(0) @binding(1) var inputTexture: ${externalTexture?  'texture_external': 'texture_2d<f32>'};
+                   @group(0) @binding(2) var ourSampler: sampler;
+                  
+                   @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
+                      
+                  
+                        let x = i32(${this.resolution.width*2}.0*(input.tex_coord.x));
+                        let y = i32(${this.resolution.height*2}.0*(input.tex_coord.y));
+                        
+                        let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
+                        
+                        let bicubic = ${textureLoad};
+                        
+                        return bicubic + vec4f(value);
+                    
+                      }            
+            `
+            });
+
+        this.pipeline =  this.device.createRenderPipeline(this.defaultPipelineConfig());
+        this.bindGroup = this.defaultBindGroup();
+        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
+
+    }
+
 
 
     defaultBindGroup(): GPUBindGroup {
@@ -62,7 +74,9 @@ class DisplayLayer extends Layer {
 
         const entries: any[]  = [];
 
+
         this.inputTextures.forEach(function (texture, i) {
+
 
             if(texture instanceof GPUExternalTexture){
                 entries.push({ binding: i, resource: texture})
