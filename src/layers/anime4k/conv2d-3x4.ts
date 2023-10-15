@@ -8,10 +8,9 @@ class Anime4KConv3x4 extends ComputeLayer {
     constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputBuffer: GPUBuffer, weights: any){
         super(inputTextures, outputBuffer, weights)
 
-        /*
+
                 const kernels: number[] = weights.weights;
                 const bias: number[] = weights.bias;
-
 
                 this.createUniform("kernel_offsets", "array<vec4f, 9>");
                 this.createUniform("kernels", "array<mat4x4f, 9>");
@@ -36,7 +35,6 @@ class Anime4KConv3x4 extends ComputeLayer {
                 this.setUniform("bias",  new Float32Array(bias));
 
 
-                */
     }
 
     lazyLoadSetup(){
@@ -49,10 +47,18 @@ class Anime4KConv3x4 extends ComputeLayer {
                 let y = id.y;
                 
                 let i = id.y*256 + x;
+                var result  = vec4f(0.0, 0.0, 0.0, 0.0);
                 
-                let val = textureLoad(inputTexture0,  vec2<u32>(x, y), 0);
+                let coord = vec2<u32>(x,y);
+                      
+                 for(var i = 0u; i < 9; i++){
+                   let offset = vec2<u32>(kernel_offsets[i].xy);
+                   result += kernels[i]*textureLoad(inputTexture0, coord+offset, 0);
+                 } 
+                    
+                result += bias;
                 
-                outputBuffer[i] = val;
+                outputBuffer[i] = result;
           }
         `);
 

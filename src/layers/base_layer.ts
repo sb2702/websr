@@ -100,8 +100,6 @@ class Layer {
 
         }
 
-        console.log(entries);
-
         if(entries.length === 0) return  null;
 
          return this.device.createBindGroup({

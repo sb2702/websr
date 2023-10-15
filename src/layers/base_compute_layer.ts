@@ -14,15 +14,6 @@ class ComputeLayer extends Layer {
 
     createStandardShader(computeShader: string): GPUShaderModule{
 
-
-        console.log('Shader module');
-        console.log(`
-              
-              ${this.computeShaderInputs()}
-              
-              ${computeShader}
-        `);
-
         return  this.device.createShaderModule({
             label: `${this.label}-shader`,
             code: `
