@@ -26,6 +26,7 @@ export default class WebSR {
     network: NeuralNetwork;
     renderer: WebSRRenderer;
     resolution: Resolution;
+    debug?: boolean;
     source: HTMLVideoElement | HTMLImageElement
 
 

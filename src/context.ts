@@ -42,7 +42,13 @@ export default class WebGPUContext {
         this.debug = debug;
 
 
-        this.context = this.canvas.getContext('webgpu');
+        let context = this.canvas.getContext('webgpu');
+
+        if(context instanceof GPUCanvasContext){
+            this.context = context;
+        } else {
+            throw  new Error("Unable to load WebGPU context");
+        }
 
         this.context.configure({
             device: this.device,
