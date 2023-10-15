@@ -6,14 +6,13 @@ class DisplayLayer extends RenderLayer {
 
     label = "DisplayLayer"
 
-    constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture: GPUTexture){
-        super(inputTextures, outputTexture)
+    constructor(inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[], output: GPUTexture){
+        super(inputs, output)
 
         this.vertexScale = {
             width: 1,
             height: 1
         };
-
 
 
         this.sampler =  this.device.createSampler({
@@ -31,7 +30,7 @@ class DisplayLayer extends RenderLayer {
     lazyLoadSetup(){
 
 
-        const externalTexture = this.inputTextures[1] instanceof GPUExternalTexture;
+        const externalTexture = this.inputs[1] instanceof GPUExternalTexture;
 
         const textureLoad = externalTexture ? 'textureSampleBaseClampToEdge(inputTexture, ourSampler, input.tex_coord)' :
             'textureSample(inputTexture, ourSampler, input.tex_coord)';
@@ -41,18 +40,18 @@ class DisplayLayer extends RenderLayer {
                 code: `
                 
                    ${this.defaultVertexShader()}
-                  
-                   @group(0) @binding(0) var pixelShuffle: texture_2d<f32>;
+                   @group(0) @binding(0) var<storage, read_write> pixelShuffle: array<vec4f>;
                    @group(0) @binding(1) var inputTexture: ${externalTexture?  'texture_external': 'texture_2d<f32>'};
                    @group(0) @binding(2) var ourSampler: sampler;
                   
                    @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                       
-                  
                         let x = i32(${this.resolution.width*2}.0*(input.tex_coord.x));
                         let y = i32(${this.resolution.height*2}.0*(input.tex_coord.y));
                         
-                        let value = textureLoad(pixelShuffle, vec2<i32>(x, y), 0).x;
+                        let i  = y*512 + x;
+                        
+                        let value = pixelShuffle[i].x;
                         
                         let bicubic = ${textureLoad};
                         
@@ -75,19 +74,19 @@ class DisplayLayer extends RenderLayer {
 
         const entries: any[]  = [];
 
+        this.inputs.forEach(function (input, i) {
 
-        this.inputTextures.forEach(function (texture, i) {
-
-
-            if(texture instanceof GPUExternalTexture){
-                entries.push({ binding: i, resource: texture})
-            } else if (texture instanceof GPUTexture){
-                entries.push({ binding: i, resource: texture.createView()})
+            if(input instanceof GPUExternalTexture){
+                entries.push({ binding: i, resource: input})
+            } else if (input instanceof GPUTexture){
+                entries.push({ binding: i, resource: input.createView()})
+            } else  if(input instanceof GPUBuffer){
+                entries.push({ binding: i, resource: {buffer: input}})
             }
 
         });
 
-        entries.push({ binding: this.inputTextures.length, resource: this.sampler })
+        entries.push({ binding: this.inputs.length, resource: this.sampler })
 
 
         return this.device.createBindGroup({
@@ -100,7 +99,7 @@ class DisplayLayer extends RenderLayer {
 
     setOutput(outputTexture: GPUTexture){
 
-        this.outputTexture = outputTexture;
+        this.output = outputTexture;
 
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }

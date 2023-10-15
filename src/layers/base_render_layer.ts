@@ -9,7 +9,7 @@ class RenderLayer extends Layer {
     output: GPUTexture;
     pipeline: GPURenderPipeline;
 
-    constructor(inputs: (GPUTexture|GPUExternalTexture)[], output:GPUTexture, weights?: any){
+    constructor(inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[], output:GPUTexture, weights?: any){
         super(inputs, output, weights);
         this.vertexScale = this.context.resolution;
     }

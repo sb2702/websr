@@ -176,7 +176,7 @@ export default class WebGPUContext {
                 size: width*height*channels*bitdepth,
                 usage: this.bufferUsage
             });
-            
+
 
         }
 
