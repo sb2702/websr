@@ -15,21 +15,21 @@ class Layer {
     renderPassDescriptor: GPURenderPassDescriptor;
     bindGroup: GPUBindGroup | null;
     label: string;
-    inputTextures: (GPUTexture|GPUExternalTexture)[];
-    outputTexture: GPUTexture;
+    inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[];
+    output: GPUTexture|GPUBuffer;
     uniforms: Uniform[];
     weights: any;
     buffers: Record<string, GPUBuffer>;
     context: WebGPUContext;
     resolution: Resolution;
 
-    constructor(inputTextures: (GPUTexture|GPUExternalTexture)[], outputTexture:GPUTexture, weights?: any){
+    constructor(inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[], output:GPUTexture|GPUBuffer, weights?: any){
 
         this.context = globalThis.context;
         this.device = this.context.device;
         this.resolution = this.context.resolution;
-        this.inputTextures = inputTextures;
-        this.outputTexture = outputTexture;
+        this.inputs = inputs;
+        this.output = output;
         this.uniforms =  [];
         this.buffers = {};
         this.weights = weights;
@@ -63,12 +63,14 @@ class Layer {
 
         const entries: any[]  = [];
 
-        this.inputTextures.forEach(function (texture, i) {
+        this.inputs.forEach(function (input, i) {
 
-            if(texture instanceof GPUExternalTexture){
-                entries.push({ binding: i, resource: texture})
-            } else if (texture instanceof GPUTexture){
-                entries.push({ binding: i, resource: texture.createView()})
+            if(input instanceof GPUExternalTexture){
+                entries.push({ binding: i, resource: input})
+            } else if (input instanceof GPUTexture){
+                entries.push({ binding: i, resource: input.createView()})
+            } else  if(input instanceof GPUBuffer){
+                entries.push({ binding: i, resource: {buffer: input}})
             }
 
         });
@@ -77,7 +79,7 @@ class Layer {
         this.uniforms.forEach((uniform, i)=>{
             entries.push(
                 {
-                    binding: i+this.inputTextures.length,
+                    binding: i+this.inputs.length,
                     resource: {
                         buffer: this.buffers[uniform.name]
                     }
@@ -95,8 +97,8 @@ class Layer {
 
     hasExternalTexture(){
 
-        for (const texture of this.inputTextures){
-            if(texture instanceof GPUExternalTexture) return true;
+        for (const input of this.inputs){
+            if(input instanceof GPUExternalTexture) return true;
         }
 
         return  false;

@@ -7,18 +7,29 @@ interface TextureOptions {
     format?: GPUTextureFormat
 }
 
+
+interface BufferOptions{
+    channels?: number,
+    bitdepth?: number,
+    width?: number,
+    height?: number
+}
+
+
 export default class WebGPUContext {
 
     canvas: HTMLCanvasElement;
     device: GPUDevice;
     context: GPUCanvasContext;
     textures: Record<string, GPUTexture>;
+    buffers: Record<string, GPUBuffer>;
     resolution: Resolution;
     input: GPUTexture | GPUExternalTexture;
     destroyed: boolean;
 
     debug: boolean;
-    usage: number;
+    textureUsage: number;
+    bufferUsage: number;
 
 
     constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement) {
@@ -27,6 +38,7 @@ export default class WebGPUContext {
         this.canvas = canvas;
         this.resolution = resolution;
         this.textures = {};
+        this.buffers = {};
         this.destroyed = false;
 
 
@@ -40,8 +52,14 @@ export default class WebGPUContext {
         
         this.debug = true;
 
-        this.usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
-        if(this.debug) this.usage  = this.usage |  GPUTextureUsage.COPY_SRC;
+        this.textureUsage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
+        this.bufferUsage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+
+        if(this.debug) {
+            // Read output pixel value
+            this.textureUsage  = this.textureUsage |  GPUTextureUsage.COPY_SRC;
+            this.bufferUsage = this.bufferUsage | GPUBufferUsage.COPY_SRC
+        }
         
 
 
@@ -109,6 +127,31 @@ export default class WebGPUContext {
         this.destroyed = true;
     }
 
+
+    buffer(key: string, options?: BufferOptions): GPUBuffer{
+
+        if(!this.buffers[key]){
+
+            options = options || {};
+
+            const width = options.width | this.resolution.width;
+            const height = options.height | this.resolution.height;
+            const channels = options.channels | 4;
+            const bitdepth = options.bitdepth | 4;
+
+
+            this.buffers[key] = this.device.createBuffer({
+                label: key,
+                size: width*height*channels*bitdepth,
+                usage: this.bufferUsage
+            });
+
+        }
+
+        return this.buffers[key];
+
+    }
+
     texture(key:string, options?: TextureOptions): GPUTexture {
 
         if(!this.textures[key]){
@@ -119,7 +162,7 @@ export default class WebGPUContext {
                 label: key,
                 size: [options.width || this.resolution.width, options.height || this.resolution.height],
                 format: options.format || 'rgba32float',
-                usage: this.usage
+                usage: this.textureUsage
             });
         }
 

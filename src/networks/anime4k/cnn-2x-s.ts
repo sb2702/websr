@@ -23,8 +23,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
         const context = this.context;
 
-
-        const conv2d_tf = new Anime4KConv3x4([context.input], context.texture('conv2d_tf'), weights['conv2d_tf']);
+        const conv2d_tf = new Anime4KConv3x4([context.input], context.buffer('conv2d_tf'), weights['conv2d_tf']);
 
         /*
         const conv2d_1_tf = new Anime4KConv8x4([context.texture('conv2d_tf')], context.texture('conv2d_1_tf'), weights['conv2d_1_tf']);
@@ -55,8 +54,8 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
             this.context.input = this.context.texture('input');
         }
 
-        this.layers[0].inputTextures[0] = this.context.input;
-     //   this.layers[5].inputTextures[1] = this.context.input;
+        this.layers[0].inputs[0] = this.context.input;
+     //   this.layers[5].inputs[1] = this.context.input;
 
 
         this.layers.forEach(function (layer) {
