@@ -36,7 +36,7 @@ class ComputeLayer extends Layer {
 
             if(this.inputs[i] instanceof GPUTexture){
                 inputs.push(`@group(0) @binding(${i}) var inputTexture${i}: texture_2d<f32>;`)
-            } else if (this.inputs[i] instanceof GPUTexture){
+            } else if (this.inputs[i] instanceof GPUExternalTexture){
                 inputs.push(`@group(0) @binding(${i}) var inputTexture${i}: texture_external;`)
             } else if(this.inputs[i] instanceof GPUBuffer) {
                 inputs.push(`@group(0) @binding(${i}) var<storage, read_write> inputBuffer${i}: array<vec4f>;`)
