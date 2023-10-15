@@ -65,15 +65,8 @@ class Anime4KConv3x4 extends ComputeLayer {
 
         this.pipeline =  this.device.createComputePipeline(this.defaultPipelineConfig());
         this.bindGroup = this.defaultBindGroup();
-
-
-
-
+        
     }
-
-
-
-
 
 }
 
