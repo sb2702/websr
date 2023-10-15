@@ -21,12 +21,12 @@ class PixelShuffle2X extends ComputeLayer {
                 let x = id.x;
                 let y = id.y;
                 
-                let i = id.y*512 + x;
+                let i = id.y*${this.resolution.width}+ x;
                 
                 let y2 = u32(floor(f32(id.y)/2.0));
                 let x2 = u32(floor(f32(id.x)/2.0));
                 
-                let i2 = y2*256 +  x2;
+                let i2 = y2*${Math.floor(this.resolution.width/2)} +  x2;
                
                 let x_floor  = u32(fract(f32(x)/2.0)*2.0);
                 let y_floor  = u32(fract(f32(y)/2.0)*2.0);

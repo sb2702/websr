@@ -24,7 +24,7 @@ class Anime4KConv8x4 extends ComputeLayer {
                 let x = id.x;
                 let y = id.y;
                 
-                let i = id.y*256 + x;
+                let i = id.y*${this.resolution.width} + x;
                 var result  = vec4f(0.0, 0.0, 0.0, 0.0);
                 
                 let coord = vec2<i32>( i32(x), i32(y));

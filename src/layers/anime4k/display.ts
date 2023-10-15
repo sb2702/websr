@@ -48,7 +48,7 @@ class DisplayLayer extends RenderLayer {
                         let x = i32(${this.resolution.width*2}.0*(input.tex_coord.x));
                         let y = i32(${this.resolution.height*2}.0*(input.tex_coord.y));
                         
-                        let i  = y*512 + x;
+                        let i  = y*${this.resolution.width*2} + x;
                         
                         let value = pixelShuffle[i].x;
                         
