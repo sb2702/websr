@@ -26,13 +26,12 @@ export default class WebGPUContext {
     resolution: Resolution;
     input: GPUTexture | GPUExternalTexture;
     destroyed: boolean;
-
-    debug: boolean;
+    debug?: boolean;
     textureUsage: number;
     bufferUsage: number;
 
 
-    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement) {
+    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement, debug?: boolean) {
 
         this.device = device;
         this.canvas = canvas;
@@ -40,6 +39,7 @@ export default class WebGPUContext {
         this.textures = {};
         this.buffers = {};
         this.destroyed = false;
+        this.debug = debug;
 
 
         this.context = this.canvas.getContext('webgpu');
@@ -49,8 +49,6 @@ export default class WebGPUContext {
             format: navigator.gpu.getPreferredCanvasFormat()
         });
 
-        
-        this.debug = true;
 
         this.textureUsage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
         this.bufferUsage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
@@ -67,6 +65,35 @@ export default class WebGPUContext {
 
 
     }
+
+
+
+    async readBuffer(bufferName: string): Promise< Uint8ClampedArray | Float32Array> {
+
+        if(!this.buffers[bufferName]) throw new Error(`No buffer with name ${bufferName}`);
+
+        const readEncoder = this.device.createCommandEncoder({
+            label: `Read ${bufferName} buffer encoder`,
+        });
+
+        const buffer = this.buffers[bufferName];
+
+        const resultBuffer = this.device.createBuffer({
+            label: 'result buffer',
+            size:  buffer.size,
+            usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST
+        });
+
+        readEncoder.copyBufferToBuffer(buffer, 0, resultBuffer, 0, resultBuffer.size);
+
+        this.device.queue.submit([readEncoder.finish()]);
+
+        await resultBuffer.mapAsync(GPUMapMode.READ);
+
+        return  new Float32Array(resultBuffer.getMappedRange());
+
+    }
+
 
 
     async readTexture(textureName: string): Promise< Uint8ClampedArray | Float32Array> {

@@ -9,6 +9,7 @@ interface WebSRParams {
     source: HTMLVideoElement | HTMLImageElement,
     canvas?: HTMLCanvasElement,
     weights: any,
+    debug?: boolean;
     network_name: NetworkName,
     gpu: GPUDevice
 }
@@ -48,7 +49,7 @@ export default class WebSR {
 
         }
 
-        this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas);
+        this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas, this.debug);
 
         globalThis.context = this.context;
 
