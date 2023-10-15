@@ -1,6 +1,5 @@
 import WebGPUContext from "../context";
 import Layer from "../layers/base_layer";
-import DisplayLayer from "../layers/anime4k/display";
 
 
 class NeuralNetwork {
