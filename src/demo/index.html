@@ -69,7 +69,7 @@
         const weights = await (await fetch('./anime4k-cnn-2x-s.json')).json()
 
         const websr = new WebSR({
-            video,
+            source:video,
             network_name: "anime4k/cnn-2x-s",
             weights,
             gpu,
