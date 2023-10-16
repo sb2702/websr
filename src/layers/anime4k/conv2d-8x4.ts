@@ -31,7 +31,7 @@ class Anime4KConv8x4 extends ComputeLayer {
                       
                  for(var i = 0u; i < 9; i++){
                    let pixel_loc = coord + vec2<i32>(kernel_offsets[i].xy);
-                   let buff_ind = pixel_loc.y*256 + pixel_loc.x;
+                   let buff_ind = pixel_loc.y*${this.resolution.width} + pixel_loc.x;
                    
                    let pix_val = inputBuffer0[buff_ind];
                   
