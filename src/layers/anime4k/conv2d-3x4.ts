@@ -12,6 +12,7 @@ class Anime4KConv3x4 extends ComputeLayer {
                 const kernels: number[] = weights.weights;
                 const bias: number[] = weights.bias;
 
+
                 this.createUniform("kernel_offsets", "array<vec4f, 9>");
                 this.createUniform("kernels", "array<mat4x4f, 9>");
                 this.createUniform("bias", "vec4f");
@@ -39,6 +40,9 @@ class Anime4KConv3x4 extends ComputeLayer {
 
     lazyLoadSetup(){
 
+
+
+
         const externalTexture = this.inputs[0] instanceof GPUExternalTexture;
 
         const textureLoad = externalTexture ? 'textureLoad(inputTexture0, coord + offset)' :
@@ -46,7 +50,7 @@ class Anime4KConv3x4 extends ComputeLayer {
 
         this.shader = this.createStandardShader(`
         
-          @compute @workgroup_size(8, 8) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
+          @compute @workgroup_size(${this.num_work_groups}, ${this.num_work_groups}) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
           
                 let x = id.x;
                 let y = id.y;

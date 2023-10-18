@@ -1,9 +1,7 @@
-import WebGPUContext from "../../context";
 import Layer from "../../layers/base_layer";
 import NeuralNetwork from "../base_network";
 import Anime4KConv3x4 from "../../layers/anime4k/conv2d-3x4";
 import Anime4KConv8x4 from "../../layers/anime4k/conv2d-8x4";
-import PixelShuffle2X from "../../layers/anime4k/pixel-shuffle";
 import DisplayLayer from "../../layers/anime4k/display";
 
 

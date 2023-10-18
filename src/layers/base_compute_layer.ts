@@ -5,9 +5,11 @@ import Layer from "./base_layer";
 class ComputeLayer extends Layer {
 
     pipeline: GPUComputePipeline;
+    num_work_groups: number;
 
     constructor(inputTextures: (GPUTexture|GPUExternalTexture|GPUBuffer)[], outputBuffer:GPUBuffer, weights?: any){
        super(inputTextures, outputBuffer, weights);
+       this.num_work_groups = 8;
     }
 
 
@@ -107,8 +109,10 @@ class ComputeLayer extends Layer {
             pass.setBindGroup(0, this.bindGroup);
         }
 
-        // We should probably play around with width/height to make it more efficient
-        pass.dispatchWorkgroups(this.resolution.width/8, this.resolution.height/8);
+        // Dividing into work groups speeds up inference. If width or height aren't cleandly divided by work groups, we round to the nearest multiple of work-groups
+        // Physically, this means shaving a few pixels (up to num_work_groups-1) off the bottom and right edges of the canvas but users shouldn't notice?
+        
+        pass.dispatchWorkgroups(Math.floor(this.resolution.width/this.num_work_groups), Math.floor(this.resolution.height/this.num_work_groups));
 
         pass.end();
 
