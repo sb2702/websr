@@ -108,7 +108,7 @@ class ComputeLayer extends Layer {
         }
 
         // We should probably play around with width/height to make it more efficient
-        pass.dispatchWorkgroups(this.resolution.width, this.resolution.height);
+        pass.dispatchWorkgroups(this.resolution.width/8, this.resolution.height/8);
 
         pass.end();
 

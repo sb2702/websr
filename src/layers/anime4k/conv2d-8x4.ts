@@ -19,7 +19,7 @@ class Anime4KConv8x4 extends ComputeLayer {
 
         this.shader = this.createStandardShader(`
         
-          @compute @workgroup_size(1, 1) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
+          @compute @workgroup_size(8, 8) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
           
                 let x = id.x;
                 let y = id.y;

@@ -39,7 +39,7 @@ module.exports = {
     plugins: [
 
         new HtmlWebpackPlugin({
-            template: 'src/demo/index.html'
+            template: 'src/demo/test.html'
         }),
 
         new CleanWebpackPlugin({
