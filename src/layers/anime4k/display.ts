@@ -45,23 +45,21 @@ class DisplayLayer extends RenderLayer {
                   
                    @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                       
-                        let x = i32(${this.resolution.width*2}.0*(input.tex_coord.x));
-                        let y = i32(${this.resolution.height*2}.0*(input.tex_coord.y));
+                        let x = ${this.resolution.width}.0*(input.tex_coord.x);
+                        let y = ${this.resolution.height}.0*(input.tex_coord.y);
                         
-                        let i  = y*${this.resolution.width*2} + x;
-
-                        let y2 = u32(floor(f32(y)/2.0));
-                        let x2 = u32(floor(f32(x)/2.0));
+                        let y2 = u32(floor(y));
+                        let x2 = u32(floor(x));
                         
-                        let i2 = y2*${Math.floor(this.resolution.width)} +  x2;
+                        let i = y2*${Math.floor(this.resolution.width)} +  x2;
                        
-                        let x_floor  = u32(fract(f32(x)/2.0)*2.0);
-                        let y_floor  = u32(fract(f32(y)/2.0)*2.0);
+                        let x_floor  = u32(fract(x)*2.0);
+                        let y_floor  = u32(fract(y)*2.0);
                         
                         //I don t know, I think this is right? I found this by trial and error
                         let c_index: u32 = x_floor + y_floor*2;  
         
-                        let value = inputBuffer0[i2][c_index];
+                        let value = inputBuffer0[i][c_index];
                         
                         let bicubic = ${textureLoad};
                         
