@@ -38,7 +38,7 @@ const gpu = await WebSR.initWebGPU();
 if(!gpu) return console.log("Browser/device doesn't support WebGPU");
 
 const websr = new WebSR({
-    video: // An HTML Video Element
+    source: // An HTML Video Element
     network_name: "anime4k/cnn-2x-s",
     weights: await (await fetch('./cnn-2x-s.json')).json() //found in weights/anime4k folder
     gpu,
