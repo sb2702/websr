@@ -91,11 +91,9 @@ The plan is to add additional neural networks, whether from other open-source pr
 ### Roadmap
 
 **Very soon**
-- [ ] Performance tests
 - [ ] Automated builds & tests
 
 **Soon-ish**
-- [ ] Re-implement with compute shaders for better performance
 - [ ] Provide lower level control for developers
 
 **At some point**

@@ -1,6 +1,6 @@
 /// <reference types="@webgpu/types" />
-import Layer from "../base_layer";
-declare class DummyLayer extends Layer {
+import RenderLayer from "../base_render_layer";
+declare class DummyLayer extends RenderLayer {
     label: string;
     constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture);
 }

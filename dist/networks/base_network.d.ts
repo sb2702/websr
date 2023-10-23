@@ -7,6 +7,6 @@ declare class NeuralNetwork {
     constructor(weights?: any);
     model(): Layer[];
     lastLayer(): Layer;
-    feedForward(video?: HTMLVideoElement): Promise<void>;
+    feedForward(source?: HTMLVideoElement | HTMLImageElement): Promise<void>;
 }
 export default NeuralNetwork;

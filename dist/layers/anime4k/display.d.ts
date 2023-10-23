@@ -1,8 +1,9 @@
 /// <reference types="@webgpu/types" />
-import Layer from "../base_layer";
-declare class DisplayLayer extends Layer {
+import RenderLayer from "../base_render_layer";
+declare class DisplayLayer extends RenderLayer {
     label: string;
-    constructor(inputTextures: (GPUTexture | GPUExternalTexture)[], outputTexture: GPUTexture);
+    constructor(inputs: (GPUTexture | GPUExternalTexture | GPUBuffer)[], output: GPUTexture);
+    lazyLoadSetup(): void;
     defaultBindGroup(): GPUBindGroup;
     setOutput(outputTexture: GPUTexture): void;
 }

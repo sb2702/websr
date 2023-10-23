@@ -1,8 +1,8 @@
 /// <reference types="@webgpu/types" />
-import Layer from "../base_layer";
-declare class Anime4KConv3x4 extends Layer {
+import ComputeLayer from "../base_compute_layer";
+declare class Anime4KConv3x4 extends ComputeLayer {
     label: string;
-    constructor(inputTextures: GPUExternalTexture[], outputTexture: GPUTexture, weights: any);
-    run(): void;
+    constructor(inputTextures: (GPUTexture | GPUExternalTexture)[], outputBuffer: GPUBuffer, weights: any);
+    lazyLoadSetup(): void;
 }
 export default Anime4KConv3x4;

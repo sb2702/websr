@@ -1,6 +1,6 @@
 /// <reference types="@webgpu/types" />
-import Layer from "../base_layer";
-declare class RGB2YUV extends Layer {
+import RenderLayer from "../base_render_layer";
+declare class RGB2YUV extends RenderLayer {
     label: "RGB2YUV";
     constructor(inputTextures: GPUTexture[], outputTexture: GPUTexture);
 }

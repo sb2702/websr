@@ -5,9 +5,10 @@ import NeuralNetwork from "./networks/base_network";
 import { NetworkName } from "./networks/network_list";
 import { Resolution } from "./utils";
 interface WebSRParams {
-    video: HTMLVideoElement;
+    source: HTMLVideoElement | HTMLImageElement;
     canvas?: HTMLCanvasElement;
     weights: any;
+    debug?: boolean;
     network_name: NetworkName;
     gpu: GPUDevice;
 }
@@ -20,11 +21,13 @@ export default class WebSR {
     network: NeuralNetwork;
     renderer: WebSRRenderer;
     resolution: Resolution;
-    video: HTMLVideoElement;
+    debug?: boolean;
+    source: HTMLVideoElement | HTMLImageElement;
     constructor(params: WebSRParams);
     static initWebGPU(): Promise<GPUDevice | false>;
     start(): Promise<void>;
     stop(): Promise<void>;
+    render(): Promise<void>;
     destroy(): Promise<void>;
 }
 export {};
