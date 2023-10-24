@@ -97,6 +97,7 @@ The plan is to add additional neural networks, whether from other open-source pr
 - [ ] Provide lower level control for developers
 
 **At some point**
-- [ ] Add more upscaling networks
-- [ ] Write a chrome plug-in optimizing to implement this easily
-- [ ] Build a static website to upscale videos on your device for free
+- [ ] Add more upscaling networks (especially for other types of content - like real life, or screen-content)
+- [ ] Dynamically switch between networks based on type of content
+- [ ] Do processing in Offscreen Canvas / worker thread
+- [ ] Write Mobile SDKs with similar functionality
