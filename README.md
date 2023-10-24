@@ -93,11 +93,9 @@ The plan is to add additional neural networks, whether from other open-source pr
 **Very soon**
 - [ ] Automated builds & tests
 
-**Soon-ish**
-- [ ] Provide lower level control for developers
-
 **At some point**
 - [ ] Add more upscaling networks (especially for other types of content - like real life, or screen-content)
 - [ ] Dynamically switch between networks based on type of content
+- [ ] Provide lower level controls (e.g. control over the render loop)
 - [ ] Do processing in Offscreen Canvas / worker thread
 - [ ] Write Mobile SDKs with similar functionality
