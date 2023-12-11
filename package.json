@@ -1,6 +1,6 @@
 {
   "name": "@websr/websr",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A free and open-source Javascript library / SDK for running practical, real-time AI Upscaling of videos and images on the web.",
   "main": "./dist/websr.js",
   "types": "./dist/main.d.ts",
