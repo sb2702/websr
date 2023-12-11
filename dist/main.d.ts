@@ -27,7 +27,7 @@ export default class WebSR {
     static initWebGPU(): Promise<GPUDevice | false>;
     start(): Promise<void>;
     stop(): Promise<void>;
-    render(): Promise<void>;
+    render(source?: ImageBitmap): Promise<void>;
     destroy(): Promise<void>;
 }
 export {};

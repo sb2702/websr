@@ -86,8 +86,8 @@ export default class WebSR {
         await this.renderer.stop();
     }
 
-    async render(){
-        await this.renderer.render();
+    async render(source?: ImageBitmap){
+        await this.renderer.render(source);
     }
 
     async destroy(){
