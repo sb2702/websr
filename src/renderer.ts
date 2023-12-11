@@ -59,8 +59,15 @@ export default class WebSRRenderer{
 
 
 
-    async render(){
-        await this.network.feedForward(this.source);
+    async render(source?: ImageBitmap){
+
+        if(source){
+            const lastLayer = this.network.lastLayer();
+
+            if(lastLayer instanceof DisplayLayer) lastLayer.setOutput(this.context.context.getCurrentTexture());
+        }
+
+        await this.network.feedForward(source? source: this.source);
     }
 
 

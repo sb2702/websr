@@ -9,5 +9,5 @@ export default class WebSRRenderer {
     start(): Promise<void>;
     stop(): Promise<void>;
     renderStep(): Promise<void>;
-    render(): Promise<void>;
+    render(source?: ImageBitmap): Promise<void>;
 }

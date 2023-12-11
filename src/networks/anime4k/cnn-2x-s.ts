@@ -37,15 +37,18 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
     }
 
-    async feedForward(source?: HTMLVideoElement | HTMLImageElement){
+    async feedForward(source?: HTMLVideoElement | HTMLImageElement| ImageBitmap){
 
 
         if(source instanceof HTMLVideoElement){
+
             this.context.input = this.context.device.importExternalTexture({source});
         } else {
 
-            const image = await createImageBitmap(source);
-            this.context.device.queue.copyExternalImageToTexture({source: image}, {texture:this.context.texture('input', {format: "rgba8unorm"})}, [source.naturalWidth, source.naturalHeight]);
+            const bitmap = source instanceof ImageBitmap ? source : await createImageBitmap(source);
+            const width = source instanceof HTMLImageElement ? source.naturalWidth : source.width;
+            const height = source instanceof HTMLImageElement ? source.naturalHeight : source.height;
+            this.context.device.queue.copyExternalImageToTexture({source: bitmap}, {texture:this.context.texture('input', {format: "rgba8unorm"})}, [width, height]);
             this.context.input = this.context.texture('input');
         }
 
