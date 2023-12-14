@@ -68,6 +68,8 @@ export default class WebSRRenderer{
         }
 
         await this.network.feedForward(source? source: this.source);
+
+        if(source) await this.context.device.queue.onSubmittedWorkDone();
     }
 
 
