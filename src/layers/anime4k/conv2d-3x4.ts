@@ -49,7 +49,6 @@ class Anime4KConv3x4 extends ComputeLayer {
             'textureLoad(inputTexture0, coord + offset, 0)';
 
         this.shader = this.createStandardShader(`
-        
           @compute @workgroup_size(${this.num_work_groups}, ${this.num_work_groups}) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
           
                 let x = id.x;
@@ -67,7 +66,7 @@ class Anime4KConv3x4 extends ComputeLayer {
                     
                 result += bias;
                 
-                outputBuffer[i] = result;
+                outputBuffer[i] = vec4<f16>(result);
           }
         `);
 

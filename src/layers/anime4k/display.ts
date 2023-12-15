@@ -37,9 +37,9 @@ class DisplayLayer extends RenderLayer {
         this.shader = this.device.createShaderModule({
                 label: `${this.label}-shader`,
                 code: `
-                
+                   enable f16;
                    ${this.defaultVertexShader()}
-                   @group(0) @binding(0) var<storage, read_write> inputBuffer0: array<vec4f>;
+                   @group(0) @binding(0) var<storage, read_write> inputBuffer0: array<vec4 <f16>>;
                    @group(0) @binding(1) var inputTexture: ${externalTexture?  'texture_external': 'texture_2d<f32>'};
                    @group(0) @binding(2) var ourSampler: sampler;
                   
@@ -63,7 +63,7 @@ class DisplayLayer extends RenderLayer {
                         
                         let bicubic = ${textureLoad};
                         
-                        return bicubic + vec4f(value);
+                        return bicubic + vec4f(f32(value));
                     
                       }            
             `

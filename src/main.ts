@@ -50,6 +50,9 @@ export default class WebSR {
 
         }
 
+        console.log("Context");
+        console.log(params.gpu.features.has('shader-f16'))
+
         this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas, this.debug);
 
         globalThis.context = this.context;
@@ -80,6 +83,7 @@ export default class WebSR {
         } else {
             device = await adapter.requestDevice();
         }
+
 
         if(!device) return false;
 

@@ -18,14 +18,14 @@ class Anime4KConv8x4 extends ComputeLayer {
         this.createUniform("bias", "vec4f");
 
         this.shader = this.createStandardShader(`
-        
+          
           @compute @workgroup_size(${this.num_work_groups}, ${this.num_work_groups}) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
           
                 let x = id.x;
                 let y = id.y;
                 
                 let i = id.y*${this.resolution.width} + x;
-                var result  = vec4f(0.0, 0.0, 0.0, 0.0);
+                var result  = vec4<f16>(0.0, 0.0, 0.0, 0.0);
                 
                 let coord = vec2<i32>( i32(x), i32(y));
                       
@@ -35,11 +35,11 @@ class Anime4KConv8x4 extends ComputeLayer {
                    
                    let pix_val = inputBuffer0[buff_ind];
                   
-                   result += kernels[i]*max(pix_val, vec4f(0.0));
-                   result += kernels[i+9]*max(-1.0*pix_val, vec4f(0.0));
+                   result += (mat4x4<f16>(kernels[i]))*max(pix_val, vec4<f16>(0.0));
+                   result += (mat4x4<f16>(kernels[i+9]))*max(-1.0*pix_val, vec4<f16>(0.0));
                  } 
                     
-                result += bias;
+                result += vec4<f16>(bias);
                 
                 outputBuffer[i] = result;
           }

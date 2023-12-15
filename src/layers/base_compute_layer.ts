@@ -19,7 +19,7 @@ class ComputeLayer extends Layer {
         return  this.device.createShaderModule({
             label: `${this.label}-shader`,
             code: `
-              
+              enable f16;
               ${this.computeShaderInputs()}
               
               ${computeShader}
@@ -41,7 +41,7 @@ class ComputeLayer extends Layer {
             } else if (this.inputs[i] instanceof GPUExternalTexture){
                 inputs.push(`@group(0) @binding(${i}) var inputTexture${i}: texture_external;`)
             } else if(this.inputs[i] instanceof GPUBuffer) {
-                inputs.push(`@group(0) @binding(${i}) var<storage, read_write> inputBuffer${i}: array<vec4f>;`)
+                inputs.push(`@group(0) @binding(${i}) var<storage, read_write> inputBuffer${i}: array<vec4<f16>>;`)
             } else {
                 throw new Error("Input is undefined or non of the correct input type");
             }
@@ -54,7 +54,7 @@ class ComputeLayer extends Layer {
             )
         });
 
-        inputs.push(`@group(0) @binding(${this.inputs.length + this.uniforms.length}) var <storage, read_write> outputBuffer: array<vec4f>;`)
+        inputs.push(`@group(0) @binding(${this.inputs.length + this.uniforms.length}) var <storage, read_write> outputBuffer: array<vec4 <f16>>;`)
 
 
         return inputs.join('\n');
