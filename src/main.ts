@@ -70,7 +70,16 @@ export default class WebSR {
 
         if(!adapter) return false;
 
-        const device = await adapter.requestDevice();
+
+        let device;
+
+        if(adapter.features.has("shader-f16")){
+            device = await adapter.requestDevice({
+                requiredFeatures:  ['shader-f16']
+            });
+        } else {
+            device = await adapter.requestDevice();
+        }
 
         if(!device) return false;
 
