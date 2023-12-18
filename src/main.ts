@@ -6,10 +6,11 @@ import {Resolution} from "./utils";
 
 
 interface WebSRParams {
-    source: HTMLVideoElement | HTMLImageElement,
+    source?: HTMLVideoElement | HTMLImageElement | ImageBitmap,
     canvas?: HTMLCanvasElement,
     weights: any,
     debug?: boolean;
+    resolution?: Resolution,
     network_name: NetworkName,
     gpu: GPUDevice
 }
@@ -27,7 +28,7 @@ export default class WebSR {
     renderer: WebSRRenderer;
     resolution: Resolution;
     debug?: boolean;
-    source: HTMLVideoElement | HTMLImageElement
+    source: HTMLVideoElement | HTMLImageElement | ImageBitmap
 
 
     constructor(params: WebSRParams) {
@@ -36,11 +37,10 @@ export default class WebSR {
 
         const source = this.source;
 
-        // We should make this dynamic
-        this.resolution = {
-            width: (source instanceof HTMLVideoElement) ? source.videoWidth : source.naturalWidth,
-            height: (source instanceof HTMLVideoElement) ? source.videoHeight : source.naturalHeight,
-        };
+        this.resolution = params.resolution? params.resolution : {
+            width: (source instanceof HTMLVideoElement) ? source.videoWidth :  (source instanceof HTMLImageElement) ?  source.naturalWidth : source.width,
+            height: (source instanceof HTMLVideoElement) ? source.videoHeight : (source instanceof HTMLImageElement) ?  source.naturalHeight: source.height
+        }
 
         if(params.canvas) this.canvas = params.canvas;
         else  {
