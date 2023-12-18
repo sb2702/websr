@@ -2,10 +2,10 @@ import NeuralNetwork from "./networks/base_network";
 export default class WebSRRenderer {
     private context;
     private network;
-    source: HTMLVideoElement | HTMLImageElement;
+    source?: HTMLVideoElement | HTMLImageElement | ImageBitmap;
     active: boolean;
     vfc: number;
-    constructor(network: NeuralNetwork, source: HTMLVideoElement | HTMLImageElement);
+    constructor(network: NeuralNetwork, source?: HTMLVideoElement | HTMLImageElement | ImageBitmap);
     start(): Promise<void>;
     stop(): Promise<void>;
     renderStep(): Promise<void>;
