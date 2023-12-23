@@ -40,8 +40,10 @@ class DisplayLayer3C extends RenderLayer {
                 
                    ${this.defaultVertexShader()}
                    @group(0) @binding(0) var<storage, read_write> inputBuffer0: array<vec4f>;
-                   @group(0) @binding(1) var inputTexture: ${externalTexture?  'texture_external': 'texture_2d<f32>'};
-                   @group(0) @binding(2) var ourSampler: sampler;
+                   @group(0) @binding(1) var<storage, read_write> inputBuffer1: array<vec4f>;
+                   @group(0) @binding(2) var<storage, read_write> inputBuffer2: array<vec4f>;
+                   @group(0) @binding(3) var inputTexture: ${externalTexture?  'texture_external': 'texture_2d<f32>'};
+                   @group(0) @binding(4) var ourSampler: sampler;
                   
                    @fragment fn fragmentMain(input: VertexShaderOutput) -> @location(0) vec4f {
                       
@@ -60,10 +62,12 @@ class DisplayLayer3C extends RenderLayer {
                         let c_index: u32 = x_floor + y_floor*2;  
         
                         let value = inputBuffer0[i][c_index];
+                        let value1 = inputBuffer1[i][c_index];
+                        let value2 = inputBuffer2[i][c_index];
                         
                         let bicubic = ${textureLoad};
                         
-                        return bicubic + vec4f(value);
+                        return bicubic + vec4f(value, value1, value2, value2);
                     
                       }            
             `
@@ -94,8 +98,10 @@ class DisplayLayer3C extends RenderLayer {
 
         });
 
+
         entries.push({ binding: this.inputs.length, resource: this.sampler })
 
+        
         return this.device.createBindGroup({
             layout: this.pipeline.getBindGroupLayout(0),
             entries

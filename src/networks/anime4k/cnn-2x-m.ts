@@ -43,7 +43,7 @@ export default class Anime4KCNN2XM extends NeuralNetwork{
 
         const paint = new DisplayLayer3C([context.buffer('conv2d_7_tf'), context.buffer('conv2d_7_tf1'), context.buffer('conv2d_7_tf2'), context.input], context.texture('output'));
 
-        layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_3_tf, conv2d_4_tf, conv2d_5_tf, conv2d_6_tf, conv2d_7_tf, conv2d_7_tf1, conv2d_7_tf2);
+        layers.push(conv2d_tf, conv2d_1_tf, conv2d_2_tf, conv2d_3_tf, conv2d_4_tf, conv2d_5_tf, conv2d_6_tf, conv2d_7_tf, conv2d_7_tf1, conv2d_7_tf2, paint);
 
         return layers;
 
@@ -65,7 +65,7 @@ export default class Anime4KCNN2XM extends NeuralNetwork{
         }
 
         this.layers[0].inputs[0] = this.context.input;
-        //this.layers[10].inputs[1] = this.context.input;
+        this.layers[10].inputs[4] = this.context.input;
 
 
         this.layers.forEach(function (layer) {
