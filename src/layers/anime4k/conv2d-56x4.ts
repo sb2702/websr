@@ -201,7 +201,7 @@ class Anime4KConv56x4 extends ComputeLayer {
             )
 
         }
-        
+
         if(entries.length === 0) return  null;
 
         return this.device.createBindGroup({

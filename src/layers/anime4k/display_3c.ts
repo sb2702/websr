@@ -69,7 +69,7 @@ class DisplayLayer3C extends RenderLayer {
                         
                         let bicubic = ${textureLoad};
                         
-                        return bicubic + vec4f(value, value1, value2, value2);
+                        return bicubic*0.01 + vec4f(value, 0, 0, 0);
                     
                       }            
             `
