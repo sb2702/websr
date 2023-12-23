@@ -74,7 +74,7 @@ class DisplayLayer3C extends RenderLayer {
                       }            
             `
             });
-        
+
         this.pipeline =  this.device.createRenderPipeline(this.defaultPipelineConfig());
         this.bindGroup = this.defaultBindGroup();
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
