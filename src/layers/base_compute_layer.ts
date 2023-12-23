@@ -16,6 +16,7 @@ class ComputeLayer extends Layer {
 
     createStandardShader(computeShader: string): GPUShaderModule{
 
+
         return  this.device.createShaderModule({
             label: `${this.label}-shader`,
             code: `
@@ -25,6 +26,7 @@ class ComputeLayer extends Layer {
               ${computeShader}
         `
         });
+
 
 
     }
@@ -46,6 +48,9 @@ class ComputeLayer extends Layer {
                 throw new Error("Input is undefined or non of the correct input type");
             }
         }
+
+      //  console.log("This layer", this.label);
+       // console.log(this.inputs.length);
 
 
         this.uniforms.forEach((uniform,i)=>{

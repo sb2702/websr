@@ -4,7 +4,8 @@ import ComputeLayer from "../base_compute_layer";
 class Anime4KConv56x4 extends ComputeLayer {
 
     label = "Anime4KConv56x4"
-
+    private bind_group_layout: GPUBindGroupLayout;
+    private pipeline_layout: GPUPipelineLayout;
 
     constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any){
         super(inputs, outputBuffer, weights)
@@ -13,7 +14,7 @@ class Anime4KConv56x4 extends ComputeLayer {
         const kernels: number[] = weights.weights;
         const bias: number[] = weights.bias;
 
-        this.createUniform("kernel_offsets", "array<vec4f, 9>");
+
         this.createUniform("kernels", "array<mat4x4f, 14>");
         this.createUniform("bias", "vec4f");
 
@@ -42,17 +43,6 @@ class Anime4KConv56x4 extends ComputeLayer {
           }
         `);
 
-        this.setUniform("kernel_offsets",  new Float32Array([
-            -1,  -1, 0, 0,
-            -1 ,  0, 0, 0,
-            -1 ,  1, 0, 0,
-            0,  -1, 0, 0,
-            0,   0, 0, 0,
-            0,   1, 0, 0,
-            1,  -1, 0, 0,
-            1 ,  0, 0, 0,
-            1 ,  1, 0, 0,
-        ]));
 
 
         this.setUniform("kernels",  new Float32Array(kernels));
@@ -62,6 +52,169 @@ class Anime4KConv56x4 extends ComputeLayer {
         this.defaultSetup();
 
     }
+
+    defaultPipelineConfig(): GPUComputePipelineDescriptor{
+
+        this.createLayout();
+
+        return {
+            label: `${this.label}-pipeline`,
+            layout: this.pipeline_layout,
+            compute: {
+                module: this.shader,
+                entryPoint: 'main',
+            },
+        }
+
+    }
+
+    createLayout(){
+        this.bind_group_layout =  this.device.createBindGroupLayout({
+            entries: [
+                {
+                    binding: 0,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 1,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 2,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 3,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 4,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 5,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 6,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+                {
+                    binding: 7,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "uniform"
+                    }
+
+                },
+                {
+                    binding: 8,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "uniform"
+                    }
+
+                },
+                {
+                    binding: 9,
+                    visibility: GPUShaderStage.COMPUTE,
+                    buffer: {
+                        type: "storage"
+                    }
+
+                },
+            ]
+        });
+
+        this.pipeline_layout = this.device.createPipelineLayout({
+            bindGroupLayouts: [this.bind_group_layout]
+        })
+
+    }
+
+
+    defaultBindGroup(){
+
+        const entries: any[]  = [];
+
+        this.inputs.forEach(function (input, i) {
+
+            if(input instanceof GPUExternalTexture){
+                entries.push({ binding: i, resource: input})
+            } else if (input instanceof GPUTexture){
+                entries.push({ binding: i, resource: input.createView()})
+            } else  if(input instanceof GPUBuffer){
+                entries.push({ binding: i, resource: {buffer: input}})
+            }
+
+        });
+
+
+        this.uniforms.forEach((uniform, i)=>{
+            entries.push(
+                {
+                    binding: i+this.inputs.length,
+                    resource: {
+                        buffer: this.buffers[uniform.name]
+                    }
+                }
+            )
+        });
+
+        if(this.output instanceof GPUBuffer){
+
+            entries.push(
+                {
+                    binding: this.inputs.length + this.uniforms.length,
+                    resource: {
+                        buffer: this.output
+                    }
+                }
+            )
+
+        }
+
+
+
+        console.log("This layer", this.label);
+
+
+        if(entries.length === 0) return  null;
+
+        return this.device.createBindGroup({
+            layout: this.bind_group_layout,
+            entries
+        });
+    }
+
 
 
 }
