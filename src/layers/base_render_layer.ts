@@ -145,7 +145,6 @@ class RenderLayer extends Layer {
 
         pass.setPipeline(this.pipeline);
 
-
         if(this.hasExternalTexture()){
             this.bindGroup = this.defaultBindGroup();
         }
@@ -160,6 +159,11 @@ class RenderLayer extends Layer {
         this.device.queue.submit([encoder.finish()]);
 
 
+    }
+
+    setOutput(outputTexture: GPUTexture){
+        this.output = outputTexture;
+        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
     }
 
 

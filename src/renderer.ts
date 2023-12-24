@@ -2,6 +2,7 @@ import WebGPUContext from "./context";
 import NeuralNetwork from "./networks/base_network";
 import DisplayLayer from "./layers/anime4k/display";
 import DisplayLayer3C from "./layers/anime4k/display_3c";
+import RenderLayer from "./layers/base_render_layer";
 
 export default class WebSRRenderer{
     private context: WebGPUContext;
@@ -65,14 +66,14 @@ export default class WebSRRenderer{
 
     async render(source?: ImageBitmap){
 
-        if(source){
-            const lastLayer = this.network.lastLayer();
-            if(lastLayer instanceof DisplayLayer || lastLayer instanceof DisplayLayer3C) lastLayer.setOutput(this.context.context.getCurrentTexture());
-        }
+
+        const lastLayer = this.network.lastLayer();
+        if(lastLayer instanceof RenderLayer) lastLayer.setOutput(this.context.context.getCurrentTexture());
+
 
         await this.network.feedForward(source? source: this.source);
 
-        if(source) await this.context.device.queue.onSubmittedWorkDone();
+        await this.context.device.queue.onSubmittedWorkDone();
     }
 
 

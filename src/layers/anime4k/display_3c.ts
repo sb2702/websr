@@ -127,13 +127,6 @@ class DisplayLayer3C extends RenderLayer {
 
     }
 
-    setOutput(outputTexture: GPUTexture){
-
-        this.output = outputTexture;
-
-        this.renderPassDescriptor = this.defaultRenderPassDescriptor();
-    }
-
 
 
 }
