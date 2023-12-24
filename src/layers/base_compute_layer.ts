@@ -45,6 +45,7 @@ class ComputeLayer extends Layer {
             } else if(this.inputs[i] instanceof GPUBuffer) {
                 inputs.push(`@group(0) @binding(${i}) var<storage, read_write> inputBuffer${i}: array<vec4f>;`)
             } else {
+                console.log(this.inputs[i]);
                 throw new Error("Input is undefined or non of the correct input type");
             }
         }

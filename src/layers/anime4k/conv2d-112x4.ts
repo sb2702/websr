@@ -13,7 +13,7 @@ class Anime4KConv112x4 extends ComputeLayer {
         const bias: number[] = weights.bias;
 
 
-        this.createUniform("kernels", "array<mat4x4f, 14>");
+        this.createUniform("kernels", "array<mat4x4f, 28>");
         this.createUniform("bias", "vec4f");
 
         let read_buffers = '';
