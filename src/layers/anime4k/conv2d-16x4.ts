@@ -14,7 +14,7 @@ class Anime4KConv16x4 extends ComputeLayer {
         const bias: number[] = weights.bias;
 
         this.createUniform("kernel_offsets", "array<vec4f, 9>");
-        this.createUniform("kernels", "array<mat4x4f, 18>");
+        this.createUniform("kernels", "array<mat4x4f, 36>");
         this.createUniform("bias", "vec4f");
 
         this.shader = this.createStandardShader(`
@@ -45,8 +45,8 @@ class Anime4KConv16x4 extends ComputeLayer {
                    
                    let pix_val = inputBuffer1[buff_ind];
                   
-                   result += kernels[i]*max(pix_val, vec4f(0.0));
-                   result += kernels[i+18]*max(-1.0*pix_val, vec4f(0.0));
+                   result += kernels[i+9]*max(pix_val, vec4f(0.0));
+                   result += kernels[i+27]*max(-1.0*pix_val, vec4f(0.0));
                  } 
                     
                 result += bias;
