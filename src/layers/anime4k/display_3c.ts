@@ -29,7 +29,7 @@ class DisplayLayer3C extends RenderLayer {
     lazyLoadSetup(){
 
 
-        const externalTexture = this.inputs[1] instanceof GPUExternalTexture;
+        const externalTexture = this.inputs[3] instanceof GPUExternalTexture;
 
         const textureLoad = externalTexture ? 'textureSampleBaseClampToEdge(inputTexture, ourSampler, input.tex_coord)' :
             'textureSample(inputTexture, ourSampler, input.tex_coord)';

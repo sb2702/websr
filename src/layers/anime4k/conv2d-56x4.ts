@@ -4,7 +4,7 @@ import ComputeLayer from "../base_compute_layer";
 class Anime4KConv56x4 extends ComputeLayer {
 
     label = "Anime4KConv56x4"
-    
+
     constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any){
         super(inputs, outputBuffer, weights)
 

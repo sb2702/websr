@@ -62,6 +62,13 @@ export default class WebSR {
 
     }
 
+    switchNetwork(network: NetworkName, weights: any){
+        if(!NetworkList[network]) throw Error(`Network ${network} is not defined or implemented`);
+        this.network = new NetworkList[network](weights);
+        this.renderer.switchNetwork(this.network);
+
+    }
+
     static async initWebGPU(): Promise<GPUDevice | false>{
 
         if(!navigator.gpu) return false;
