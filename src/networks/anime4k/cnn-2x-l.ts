@@ -6,6 +6,7 @@ import Anime4KConv56x4 from "../../layers/anime4k/conv2d-56x4";
 import DisplayLayer3C from "../../layers/anime4k/display_3c";
 import Anime4KConv16x4 from "../../layers/anime4k/conv2d-16x4";
 import Anime4KConv112x4 from "../../layers/anime4k/conv2d-112x4";
+import Anime4KConcat2 from "../../layers/anime4k/conv2d-concat2";
 
 
 export default class Anime4KCNN2XL extends NeuralNetwork{
@@ -37,17 +38,20 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
 
        for (let c =0; c < 3; c++){
 
-           const sources = [];
+           const sources_0 = [];
+           const sources_1 = [];
 
            for(let i =0; i < 7; i++){
                let source = (i==0) ? `conv2d_tf` : `conv2d_${i}_tf`;
-               sources.push(context.buffer(source));
-               sources.push(context.buffer(source+ "1"));
+               sources_0.push(context.buffer(source));
+               sources_1.push(context.buffer(source + "1"));
+
            }
 
            const dest = (c==0) ? `conv2d_last_tf` : `conv2d_last_tf${c}`;
-           layers.push(new Anime4KConv112x4(sources, context.buffer(dest), weights[dest]));
-
+           layers.push(new Anime4KConv112x4(sources_0, context.buffer(`conv2d_last_${c}_pt1`), weights[dest], false));
+           layers.push(new Anime4KConv112x4(sources_1, context.buffer(`conv2d_last_${c}_pt2`), weights[dest], true));
+           layers.push(new Anime4KConcat2([context.buffer(`conv2d_last_${c}_pt1`), context.buffer(`conv2d_last_${c}_pt2`)], context.buffer(dest), {}))
        }
 
 

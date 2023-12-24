@@ -5,7 +5,7 @@ class Anime4KConv112x4 extends ComputeLayer {
 
     label = "Anime4KConv112x4"
 
-    constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any){
+    constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any, first: boolean){
         super(inputs, outputBuffer, weights)
 
 
@@ -19,15 +19,27 @@ class Anime4KConv112x4 extends ComputeLayer {
         let read_buffers = '';
 
         for (let i=0; i < 7; i++){
-            read_buffers +=`
-            let pixel_val${2*i} = inputBuffer${2*i}[buff_ind];
-            result += kernels[${4*i}]*max(pixel_val${2*i}, vec4f(0.0));
-            result += kernels[${4*i+2}]*max(-1.0*pixel_val${2*i}, vec4f(0.0));
-            
-            let pixel_val${2*i+1} = inputBuffer${2*i+1}[buff_ind];
-            result += kernels[${4*i+1}]*max(pixel_val${2*i+1}, vec4f(0.0));
-            result += kernels[${4*i+3}]*max(-1.0*pixel_val${2*i+1}, vec4f(0.0));
+
+
+            if(first){
+
+                read_buffers +=`
+            let pixel_val${i} = inputBuffer${i}[buff_ind];
+            result += kernels[${4*i}]*max(pixel_val${i}, vec4f(0.0));
+            result += kernels[${4*i+2}]*max(-1.0*pixel_val${i}, vec4f(0.0));
             `;
+            } else {
+
+                read_buffers +=`
+                let pixel_val${i} = inputBuffer${i}[buff_ind];
+                result += kernels[${4*i+1}]*max(pixel_val${i}, vec4f(0.0));
+                result += kernels[${4*i+3}]*max(-1.0*pixel_val${i}, vec4f(0.0));`;
+
+            }
+
+
+
+
 
         }
 
