@@ -45,14 +45,14 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
                sources.push(context.buffer(source+ "1"));
            }
 
-           const dest = (c==0) ? `conv2d_7_tf` : `conv2d_7_tf${c}`;
+           const dest = (c==0) ? `conv2d_last_tf` : `conv2d_last_tf${c}`;
            layers.push(new Anime4KConv112x4(sources, context.buffer(dest), weights[dest]));
 
        }
 
 
 
-       const paint = new DisplayLayer3C([context.buffer('conv2d_7_tf'), context.buffer('conv2d_7_tf1'), context.buffer('conv2d_7_tf2'), context.input], context.texture('output'));
+       const paint = new DisplayLayer3C([context.buffer('conv2d_last_tf'), context.buffer('conv2d_last_tf1'), context.buffer('conv2d_last_tf2'), context.input], context.texture('output'));
 
        layers.push(paint);
 

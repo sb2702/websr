@@ -20,9 +20,13 @@ class Anime4KConv112x4 extends ComputeLayer {
 
         for (let i=0; i < 7; i++){
             read_buffers +=`
-            let pixel_val${i} = inputBuffer${i}[buff_ind];
-            result += kernels[${2*i}]*max(pixel_val${i}, vec4f(0.0));
-            result += kernels[${2*i+1}]*max(-1.0*pixel_val${i}, vec4f(0.0));
+            let pixel_val${2*i} = inputBuffer${2*i}[buff_ind];
+            result += kernels[${4*i}]*max(pixel_val${2*i}, vec4f(0.0));
+            result += kernels[${4*i+2}]*max(-1.0*pixel_val${2*i}, vec4f(0.0));
+            
+            let pixel_val${2*i+1} = inputBuffer${2*i+1}[buff_ind];
+            result += kernels[${4*i+1}]*max(pixel_val${2*i+1}, vec4f(0.0));
+            result += kernels[${4*i+3}]*max(-1.0*pixel_val${2*i+1}, vec4f(0.0));
             `;
 
         }
