@@ -41,41 +41,14 @@ class Anime4KConv56x4 extends ComputeLayer {
                 
                 let coord = vec2<i32>( i32(x), i32(y));
                
-                      
-                 
-               let buff_ind = coord.y*${this.resolution.width} + coord.x;
-               ${read_buffers}
+                let buff_ind = coord.y*${this.resolution.width} + coord.x;
+                ${read_buffers}
                       
                 result += bias;
                 
                 outputBuffer[buff_ind] = result;
           }
         `);
-
-
-        console.log("Shader", `
-        
-          @compute @workgroup_size(${this.num_work_groups}, ${this.num_work_groups}) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
-          
-                let x = id.x;
-                let y = id.y;
-                
-                let i = id.y*${this.resolution.width} + x;
-                var result  = vec4f(0.0, 0.0, 0.0, 0.0);
-                
-                let coord = vec2<i32>( i32(x), i32(y));
-               
-                      
-                 
-               let buff_ind = coord.y*${this.resolution.width} + coord.x;
-               ${read_buffers}
-                      
-                result += bias;
-                
-                outputBuffer[buff_ind] = result;
-          }
-        `);
-
 
         this.setUniform("kernels",  new Float32Array(kernels));
         this.setUniform("bias",  new Float32Array(bias));
