@@ -25,6 +25,7 @@ export default class WebSR {
     debug?: boolean;
     source: HTMLVideoElement | HTMLImageElement | ImageBitmap;
     constructor(params: WebSRParams);
+    switchNetwork(network: NetworkName, weights: any): void;
     static initWebGPU(): Promise<GPUDevice | false>;
     start(): Promise<void>;
     stop(): Promise<void>;

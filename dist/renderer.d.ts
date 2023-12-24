@@ -6,6 +6,7 @@ export default class WebSRRenderer {
     active: boolean;
     vfc: number;
     constructor(network: NeuralNetwork, source?: HTMLVideoElement | HTMLImageElement | ImageBitmap);
+    switchNetwork(network: NeuralNetwork): void;
     start(): Promise<void>;
     stop(): Promise<void>;
     renderStep(): Promise<void>;

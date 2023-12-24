@@ -5,6 +5,5 @@ declare class DisplayLayer extends RenderLayer {
     constructor(inputs: (GPUTexture | GPUExternalTexture | GPUBuffer)[], output: GPUTexture);
     lazyLoadSetup(): void;
     defaultBindGroup(): GPUBindGroup;
-    setOutput(outputTexture: GPUTexture): void;
 }
 export default DisplayLayer;
