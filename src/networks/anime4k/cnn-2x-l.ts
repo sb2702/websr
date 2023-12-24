@@ -36,7 +36,6 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
        }
 
 
-       console.log(Object.keys(weights));
        for (let c =0; c < 3; c++){
 
            const sources_0 = [];
