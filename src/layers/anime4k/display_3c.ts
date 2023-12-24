@@ -4,8 +4,6 @@ import RenderLayer from "../base_render_layer";
 class DisplayLayer3C extends RenderLayer {
 
     label = "DisplayLayer3C"
-    private bind_group_layout: GPUBindGroupLayout;
-    private pipeline_layout: GPUPipelineLayout;
 
     constructor(inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[], output: GPUTexture){
         super(inputs, output)
@@ -82,63 +80,11 @@ class DisplayLayer3C extends RenderLayer {
     }
 
 
-    createLayout(){
-
-        this.bind_group_layout =  this.device.createBindGroupLayout({
-            entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 1,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 2,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 3,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    texture:{}
-
-                },
-                {
-                    binding: 4,
-                    visibility: GPUShaderStage.FRAGMENT,
-                    sampler: {}
-
-                }
-            ]
-        });
-
-        this.pipeline_layout = this.device.createPipelineLayout({
-            bindGroupLayouts: [this.bind_group_layout]
-        })
-
-    }
-
-
     defaultPipelineConfig(): GPURenderPipelineDescriptor {
-
-        this.createLayout();
 
         return {
             label: `${this.label}-pipeline`,
-            layout: this.pipeline_layout,
+            layout: 'auto',
             vertex: {
                 module: this.shader,
                 entryPoint: 'vertexMain',
@@ -174,7 +120,7 @@ class DisplayLayer3C extends RenderLayer {
 
 
         return this.device.createBindGroup({
-            layout: this.bind_group_layout,
+            layout: this.pipeline.getBindGroupLayout(0),
             entries
         });
 
