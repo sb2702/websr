@@ -4,9 +4,7 @@ import ComputeLayer from "../base_compute_layer";
 class Anime4KConv56x4 extends ComputeLayer {
 
     label = "Anime4KConv56x4"
-    private bind_group_layout: GPUBindGroupLayout;
-    private pipeline_layout: GPUPipelineLayout;
-
+    
     constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any){
         super(inputs, outputBuffer, weights)
 
@@ -60,11 +58,9 @@ class Anime4KConv56x4 extends ComputeLayer {
 
     defaultPipelineConfig(): GPUComputePipelineDescriptor{
 
-        this.createLayout();
-
         return {
             label: `${this.label}-pipeline`,
-            layout: this.pipeline_layout,
+            layout: 'auto',
             compute: {
                 module: this.shader,
                 entryPoint: 'main',
@@ -72,99 +68,6 @@ class Anime4KConv56x4 extends ComputeLayer {
         }
 
     }
-
-    createLayout(){
-        this.bind_group_layout =  this.device.createBindGroupLayout({
-            entries: [
-                {
-                    binding: 0,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 1,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 2,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 3,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 4,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 5,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 6,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-                {
-                    binding: 7,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "uniform"
-                    }
-
-                },
-                {
-                    binding: 8,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "uniform"
-                    }
-
-                },
-                {
-                    binding: 9,
-                    visibility: GPUShaderStage.COMPUTE,
-                    buffer: {
-                        type: "storage"
-                    }
-
-                },
-            ]
-        });
-
-        this.pipeline_layout = this.device.createPipelineLayout({
-            bindGroupLayouts: [this.bind_group_layout]
-        })
-
-    }
-
 
     defaultBindGroup(){
 
@@ -210,7 +113,7 @@ class Anime4KConv56x4 extends ComputeLayer {
         if(entries.length === 0) return  null;
 
         return this.device.createBindGroup({
-            layout: this.bind_group_layout,
+            layout: this.pipeline.getBindGroupLayout(0),
             entries
         });
     }
