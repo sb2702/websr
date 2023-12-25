@@ -10,11 +10,9 @@ class Anime4KConv112x4 extends ComputeLayer {
 
 
         const kernels: number[] = weights.weights;
-        const bias: number[] = weights.bias;
 
 
         this.createUniform("kernels", "array<mat4x4f, 28>");
-        this.createUniform("bias", "vec4f");
 
         let read_buffers = '';
 
@@ -24,9 +22,9 @@ class Anime4KConv112x4 extends ComputeLayer {
             if(first){
 
                 read_buffers +=`
-            let pixel_val${i} = inputBuffer${i}[buff_ind];
-            result += kernels[${4*i}]*max(pixel_val${i}, vec4f(0.0));
-            result += kernels[${4*i+2}]*max(-1.0*pixel_val${i}, vec4f(0.0));
+                let pixel_val${i} = inputBuffer${i}[buff_ind];
+                result += kernels[${4*i}]*max(pixel_val${i}, vec4f(0.0));
+                result += kernels[${4*i+2}]*max(-1.0*pixel_val${i}, vec4f(0.0));
             `;
             } else {
 
@@ -43,6 +41,7 @@ class Anime4KConv112x4 extends ComputeLayer {
 
         }
 
+
         this.shader = this.createStandardShader(`
         
           @compute @workgroup_size(${this.num_work_groups}, ${this.num_work_groups}) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
@@ -57,15 +56,12 @@ class Anime4KConv112x4 extends ComputeLayer {
                
                 let buff_ind = coord.y*${this.resolution.width} + coord.x;
                 ${read_buffers}
-                      
-                result += bias;
                 
-                outputBuffer[buff_ind] = result;
+                outputBuffer[i] = result;
           }
         `);
 
         this.setUniform("kernels",  new Float32Array(kernels));
-        this.setUniform("bias",  new Float32Array(bias));
 
 
         this.defaultSetup();

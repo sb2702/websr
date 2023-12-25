@@ -49,9 +49,9 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
            }
 
            const dest = (c==0) ? `conv2d_last_tf` : `conv2d_last_tf${c}`;
-           layers.push(new Anime4KConv112x4(sources_0, context.buffer(`conv2d_last_${c}_pt1`), weights[dest], false));
-           layers.push(new Anime4KConv112x4(sources_1, context.buffer(`conv2d_last_${c}_pt2`), weights[dest], true));
-           layers.push(new Anime4KConcat2([context.buffer(`conv2d_last_${c}_pt1`), context.buffer(`conv2d_last_${c}_pt2`)], context.buffer(dest), {}))
+           layers.push(new Anime4KConv112x4(sources_0, context.buffer(`conv2d_last_${c}_pt1`), weights[dest], true));
+           layers.push(new Anime4KConv112x4(sources_1, context.buffer(`conv2d_last_${c}_pt2`), weights[dest], false));
+           layers.push(new Anime4KConcat2([context.buffer(`conv2d_last_${c}_pt1`), context.buffer(`conv2d_last_${c}_pt2`)], context.buffer(dest), weights[dest]))
        }
 
 

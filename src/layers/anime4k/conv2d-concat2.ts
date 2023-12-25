@@ -8,6 +8,9 @@ class Anime4KConcat2 extends ComputeLayer {
     constructor(inputs: GPUBuffer[], outputBuffer: GPUBuffer, weights: any){
         super(inputs, outputBuffer, weights)
 
+        this.createUniform("bias", "vec4f");
+        const bias: number[] = weights.bias;
+
 
         this.shader = this.createStandardShader(`
         
@@ -23,12 +26,15 @@ class Anime4KConcat2 extends ComputeLayer {
                
                 let buff_ind = coord.y*${this.resolution.width} + coord.x;
                
-                outputBuffer[buff_ind] = inputBuffer0[buff_ind] + inputBuffer1[buff_ind];
+                outputBuffer[buff_ind] = inputBuffer0[buff_ind] + inputBuffer1[buff_ind] + bias;
           }
         `);
 
 
+        this.setUniform("bias",  new Float32Array(bias));
+
         this.defaultSetup();
+
 
     }
 
