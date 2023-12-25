@@ -53,7 +53,7 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
         }
 
         this.layers[0].inputs[0] = this.context.input;
-        this.layers[4].inputs[1] = this.context.input;
+        this.layers[this.layers.length - 1].inputs[1] = this.context.input;
 
 
         this.layers.forEach(function (layer) {
