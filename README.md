@@ -49,6 +49,49 @@ await websr.start();   // Play the video
 
 ```
 
+### Network options
+
+There are currently 3 networks defined:`anime4k/cnn-2x-s` (small), `anime4k/cnn-2x-m` (medium) and `anime4k/cnn-2x-l` (large). 
+
+For each network, I've not only included with the weights from Anime4K, but I've also retrained the networks on Real Life and 3D (gaming/3d animation) content. These can be found in the [weights/anime4k folder](https://github.com/sb2702/websr/tree/main/weights/anime4k)
+
+For convenience, I've also included a [content detection style network](https://github.com/sb2702/websr/blob/main/weights/tflite/content_detection_mobilenet_v3.tflite) implemented in TFLite. You can use it as follows:
+
+        import '@tensorflow/tfjs-backend-cpu';
+        import * as tf from '@tensorflow/tfjs-core';
+        import * as tflite from '@tensorflow/tfjs-tflite';
+
+        const contentDetectionCanvas = document.createElement('canvas');
+        contentDetectionCanvas.width = 224;
+        contentDetectionCanvas.height = 224;
+        const contentDetectionCtx = contentDetectionCanvas.getContext('2d', {willReadFrequently: true});
+
+        const tfliteModel = await tflite.loadTFLiteModel('./content_detection_mobilenet_v3.tflite',  {} );
+
+        const source = //video, image, imageBitmap, etc... 
+
+        contentDetectionCtx.drawImage(source, source.width/2-112, source.height/2-112, 224, 224, 0, 0, 224, 224 ); // Take the center 224x224 crop of the source
+
+        
+        const input = tf.div(tf.expandDims(img), 255);
+
+        const outputTensor = tfliteModel.predict(input);
+
+        const values = outputTensor.dataSync();
+
+        if(values[1] > values[0]) //animation
+        else: //real life
+
+        // I tried building a 3-network classifier, but ran into some accracy issues
+
+
+
+
+
+
+
+
+
 ### Why WebSR
 
 [Super resolution](https://en.wikipedia.org/wiki/Super-resolution_imaging) is a technique which uses Neural Networks to "reconstruct" a high-resolution image from a low resolution image. Practically speaking, it provides better visual results than traditional upscaling algorithms like Bicubic, which is what devices and browsers usually use by default, at the cost of significantly more computation.
