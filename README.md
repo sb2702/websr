@@ -49,6 +49,29 @@ await websr.start();   // Play the video
 
 ```
 
+### More control
+
+If you want more control, you can manage the render cycle yourself. You can do this the following way:
+
+    const websr = new WebSR({
+        resolution: {
+            width: 640,
+            height: 360
+        }
+        network_name: "anime4k/cnn-2x-s",
+        weights: await (await fetch('./cnn-2x-s.json')).json() //found in weights/anime4k folder
+        gpu,
+        canvas: //A canvas, with 2x the width and height of your input video
+    });
+
+    await websr.render(source); // ImageBitmap, HTML5VideoElement or HTML5Image element
+
+
+### Worker thread
+
+Currently doesn't work in a worker thread. I'll fix it soon (though you're more than welcome to add a PR).
+
+
 ### Network options
 
 There are currently 3 networks defined:`anime4k/cnn-2x-s` (small), `anime4k/cnn-2x-m` (medium) and `anime4k/cnn-2x-l` (large). 
