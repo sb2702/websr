@@ -1,4 +1,5 @@
 import {Resolution} from "./utils";
+import {DisplayScale} from "./networks/network_list";
 
 
 interface TextureOptions {
@@ -29,9 +30,10 @@ export default class WebGPUContext {
     debug?: boolean;
     textureUsage: number;
     bufferUsage: number;
+    scale: DisplayScale;
 
 
-    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement, debug?: boolean) {
+    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement, scale: DisplayScale, debug?: boolean) {
 
         this.device = device;
         this.canvas = canvas;
@@ -39,6 +41,7 @@ export default class WebGPUContext {
         this.textures = {};
         this.buffers = {};
         this.destroyed = false;
+        this.scale = scale;
         this.debug = debug;
 
 

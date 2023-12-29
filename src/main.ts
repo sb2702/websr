@@ -1,7 +1,7 @@
 import WebGPUContext from './context'
 import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
-import {NetworkList, NetworkName} from "./networks/network_list";
+import {NetworkList, NetworkName, NetworkScales, DisplayScale} from "./networks/network_list";
 import {Resolution} from "./utils";
 
 
@@ -29,9 +29,15 @@ export default class WebSR {
     resolution: Resolution;
     debug?: boolean;
     source: HTMLVideoElement | HTMLImageElement | ImageBitmap
+    scale: DisplayScale;
 
 
     constructor(params: WebSRParams) {
+
+
+
+        if(!NetworkList[params.network_name]) throw Error(`Network ${params.network_name} is not defined or implemented`);
+
 
         this.source = params.source;
 
@@ -42,19 +48,21 @@ export default class WebSR {
             height: (source instanceof HTMLVideoElement) ? source.videoHeight : (source instanceof HTMLImageElement) ?  source.naturalHeight: source.height
         }
 
+        const scale = NetworkScales[params.network_name];
+
         if(params.canvas) this.canvas = params.canvas;
         else  {
             this.canvas = new HTMLCanvasElement();
-            this.canvas.width = this.resolution.width*2;
-            this.canvas.height = this.resolution.height*2;
+            this.canvas.width = this.resolution.width*scale;
+            this.canvas.height = this.resolution.height*scale;
 
         }
 
-        this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas, this.debug);
+        this.scale = scale;
+
+        this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas, this.scale, this.debug);
 
         globalThis.context = this.context;
-
-        if(!NetworkList[params.network_name]) throw Error(`Network ${params.network_name} is not defined or implemented`);
 
         this.network = new NetworkList[params.network_name](params.weights);
 

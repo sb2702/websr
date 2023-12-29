@@ -39,7 +39,7 @@ module.exports = {
     plugins: [
 
         new HtmlWebpackPlugin({
-            template: 'src/demo/index.html'
+            template: 'src/demo/test-res.html'
         }),
 
         new CleanWebpackPlugin({
@@ -49,6 +49,7 @@ module.exports = {
         new CopyWebpackPlugin( {
             patterns: [
                 { from: "src/demo/*.png", to: path.basename('[name].png') },
+                { from: "src/demo/*.jpg", to: path.basename('[name].jpg') },
                 { from: "src/demo/*.webm", to: path.basename('[name].webm') },
                 { from: "src/demo/*.css", to: path.basename('[name].css') },
                 { from: "src/demo/*.js", to: path.basename('[name].js') },
