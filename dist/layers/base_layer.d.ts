@@ -1,4 +1,3 @@
-/// <reference types="@webgpu/types" />
 import WebGPUContext from "../context";
 import { Resolution } from "../utils";
 interface Uniform {

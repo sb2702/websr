@@ -1,4 +1,3 @@
-/// <reference types="@webgpu/types" />
 import RenderLayer from "../base_render_layer";
 declare class GuassianLayer extends RenderLayer {
     label: string;

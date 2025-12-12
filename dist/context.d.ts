@@ -1,5 +1,5 @@
-/// <reference types="@webgpu/types" />
 import { Resolution } from "./utils";
+import { DisplayScale } from "./networks/network_list";
 interface TextureOptions {
     width?: number;
     height?: number;
@@ -23,7 +23,8 @@ export default class WebGPUContext {
     debug?: boolean;
     textureUsage: number;
     bufferUsage: number;
-    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement, debug?: boolean);
+    scale: DisplayScale;
+    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement, scale: DisplayScale, debug?: boolean);
     readBuffer(bufferName: string): Promise<Uint8ClampedArray | Float32Array>;
     readTexture(textureName: string): Promise<Uint8ClampedArray | Float32Array>;
     destroy(): void;

@@ -1,6 +1,6 @@
 {
   "name": "@websr/websr",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "A free and open-source Javascript library / SDK for running practical, real-time AI Upscaling of videos and images on the web.",
   "main": "./dist/websr.js",
   "types": "./dist/main.d.ts",
@@ -17,6 +17,7 @@
   "keywords": [
     "AI",
     "Upscaling",
+    "Video Enhancement",
     "Super",
     "Resolution",
     "WebGPU"
@@ -26,7 +27,7 @@
   "bugs": {
     "url": "https://github.com/sb2702/websr/issues"
   },
-  "homepage": "https://github.com/sb2702/websr#readme",
+  "homepage": "https://free.upscaler.video",
   "devDependencies": {
     "@webgpu/types": "^0.1.34",
     "clean-webpack-plugin": "^4.0.0",

@@ -1,4 +1,3 @@
-/// <reference types="@webgpu/types" />
 import ComputeLayer from "../base_compute_layer";
 declare class Anime4KConv3x4 extends ComputeLayer {
     label: string;

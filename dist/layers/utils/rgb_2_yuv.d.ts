@@ -1,4 +1,3 @@
-/// <reference types="@webgpu/types" />
 import RenderLayer from "../base_render_layer";
 declare class RGB2YUV extends RenderLayer {
     label: "RGB2YUV";
