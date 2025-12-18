@@ -3,18 +3,19 @@ import NeuralNetwork from "./networks/base_network";
 import DisplayLayer from "./layers/anime4k/display";
 import DisplayLayer3C from "./layers/anime4k/display_3c";
 import RenderLayer from "./layers/base_render_layer";
+import {MediaSource, isHTMLVideoElement} from "./utils";
 
 export default class WebSRRenderer{
     private context: WebGPUContext;
     private network: NeuralNetwork;
 
-    source?: HTMLVideoElement | HTMLImageElement | ImageBitmap;
+    source?: MediaSource;
     active: boolean;
     vfc: number;
 
 
 
-    constructor(network: NeuralNetwork, source?: HTMLVideoElement | HTMLImageElement | ImageBitmap) {
+    constructor(network: NeuralNetwork, source?: MediaSource) {
 
         this.context = globalThis.context;
         this.network = network;
@@ -43,7 +44,7 @@ export default class WebSRRenderer{
 
     async stop(){
         this.active = false;
-        if(this.vfc && this.source && this.source instanceof HTMLVideoElement) this.source.cancelVideoFrameCallback(this.vfc);
+        if(this.vfc && this.source && isHTMLVideoElement(this.source)) this.source.cancelVideoFrameCallback(this.vfc);
     }
 
     async renderStep(){
@@ -55,7 +56,7 @@ export default class WebSRRenderer{
 
         await this.render();
 
-        if(this.active && this.source && this.source instanceof HTMLVideoElement) {
+        if(this.active && this.source && isHTMLVideoElement(this.source)) {
             this.vfc = this.source.requestVideoFrameCallback(this.renderStep.bind(this));
         }
 

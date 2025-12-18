@@ -3,6 +3,7 @@ import NeuralNetwork from "../base_network";
 import Anime4KConv3x4 from "../../layers/anime4k/conv2d-3x4";
 import Anime4KConv8x4 from "../../layers/anime4k/conv2d-8x4";
 import DisplayLayer from "../../layers/anime4k/display";
+import {MediaSource, isHTMLVideoElement, isHTMLImageElement, isImageBitmap, getSourceWidth, getSourceHeight} from "../../utils";
 
 
 export default class Anime4KCNN2XS extends NeuralNetwork{
@@ -37,17 +38,17 @@ export default class Anime4KCNN2XS extends NeuralNetwork{
 
     }
 
-    async feedForward(source?: HTMLVideoElement | HTMLImageElement| ImageBitmap){
+    async feedForward(source?: MediaSource){
 
 
-        if(source instanceof HTMLVideoElement){
+        if(isHTMLVideoElement(source)){
 
             this.context.input = this.context.device.importExternalTexture({source});
         } else {
 
-            const bitmap = source instanceof ImageBitmap ? source : await createImageBitmap(source);
-            const width = source instanceof HTMLImageElement ? source.naturalWidth : source.width;
-            const height = source instanceof HTMLImageElement ? source.naturalHeight : source.height;
+            const bitmap = isImageBitmap(source) ? source : await createImageBitmap(source);
+            const width = getSourceWidth(source);
+            const height = getSourceHeight(source);
             this.context.device.queue.copyExternalImageToTexture({source: bitmap}, {texture:this.context.texture('input', {format: "rgba8unorm"})}, [width, height]);
             this.context.input = this.context.texture('input');
         }

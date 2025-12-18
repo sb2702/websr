@@ -1,11 +1,12 @@
 import NeuralNetwork from "./networks/base_network";
+import { MediaSource } from "./utils";
 export default class WebSRRenderer {
     private context;
     private network;
-    source?: HTMLVideoElement | HTMLImageElement | ImageBitmap;
+    source?: MediaSource;
     active: boolean;
     vfc: number;
-    constructor(network: NeuralNetwork, source?: HTMLVideoElement | HTMLImageElement | ImageBitmap);
+    constructor(network: NeuralNetwork, source?: MediaSource);
     switchNetwork(network: NeuralNetwork): void;
     start(): Promise<void>;
     stop(): Promise<void>;

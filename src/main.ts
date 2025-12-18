@@ -2,11 +2,11 @@ import WebGPUContext from './context'
 import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
 import {NetworkList, NetworkName, NetworkScales, DisplayScale} from "./networks/network_list";
-import {Resolution} from "./utils";
+import {Resolution, MediaSource, getSourceWidth, getSourceHeight} from "./utils";
 
 
 interface WebSRParams {
-    source?: HTMLVideoElement | HTMLImageElement | ImageBitmap,
+    source?: MediaSource,
     canvas?: HTMLCanvasElement,
     weights: any,
     debug?: boolean;
@@ -28,7 +28,7 @@ export default class WebSR {
     renderer: WebSRRenderer;
     resolution: Resolution;
     debug?: boolean;
-    source: HTMLVideoElement | HTMLImageElement | ImageBitmap
+    source: MediaSource
     scale: DisplayScale;
 
 
@@ -44,8 +44,8 @@ export default class WebSR {
         const source = this.source;
 
         this.resolution = params.resolution? params.resolution : {
-            width: (source instanceof HTMLVideoElement) ? source.videoWidth :  (source instanceof HTMLImageElement) ?  source.naturalWidth : source.width,
-            height: (source instanceof HTMLVideoElement) ? source.videoHeight : (source instanceof HTMLImageElement) ?  source.naturalHeight: source.height
+            width: getSourceWidth(source),
+            height: getSourceHeight(source)
         }
 
         const scale = NetworkScales[params.network_name];

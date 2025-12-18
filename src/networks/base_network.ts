@@ -1,5 +1,6 @@
 import WebGPUContext from "../context";
 import Layer from "../layers/base_layer";
+import {MediaSource} from "../utils";
 
 
 class NeuralNetwork {
@@ -25,7 +26,7 @@ class NeuralNetwork {
         return this.layers[this.layers.length-1];
     }
 
-    async feedForward(source?: HTMLVideoElement | HTMLImageElement | ImageBitmap){
+    async feedForward(source?: MediaSource){
 
 
         this.layers.forEach(layer => {
