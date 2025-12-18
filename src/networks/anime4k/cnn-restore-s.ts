@@ -3,7 +3,7 @@ import NeuralNetwork from "../base_network";
 import Anime4KConv3x4 from "../../layers/anime4k/conv2d-3x4";
 import Anime4KConv8x4 from "../../layers/anime4k/conv2d-8x4";
 import DisplayLayer from "../../layers/anime4k/display_1x";
-import {MediaSource, isHTMLVideoElement, isImageBitmap, getSourceWidth, getSourceHeight} from "../../utils";
+import {MediaSource, isHTMLVideoElement, isVideoFrame, isImageBitmap, getSourceWidth, getSourceHeight} from "../../utils";
 
 
 export default class Anime4KCNNRS extends NeuralNetwork{
@@ -41,7 +41,7 @@ export default class Anime4KCNNRS extends NeuralNetwork{
     async feedForward(source?: MediaSource){
 
 
-        if(isHTMLVideoElement(source)){
+        if(isHTMLVideoElement(source) || isVideoFrame(source)){
 
             this.context.input = this.context.device.importExternalTexture({source});
         } else {

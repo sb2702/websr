@@ -7,7 +7,7 @@ import DisplayLayer3C from "../../layers/anime4k/display_3c";
 import Anime4KConv16x4 from "../../layers/anime4k/conv2d-16x4";
 import Anime4KConv112x4 from "../../layers/anime4k/conv2d-112x4";
 import Anime4KConcat2 from "../../layers/anime4k/conv2d-concat2";
-import {MediaSource, isHTMLVideoElement, isImageBitmap, getSourceWidth, getSourceHeight} from "../../utils";
+import {MediaSource, isHTMLVideoElement, isVideoFrame, isImageBitmap, getSourceWidth, getSourceHeight} from "../../utils";
 
 
 export default class Anime4KCNN2XL extends NeuralNetwork{
@@ -68,7 +68,7 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
     async feedForward(source?: MediaSource){
 
 
-        if(isHTMLVideoElement(source)){
+        if(isHTMLVideoElement(source) || isVideoFrame(source)){
 
             this.context.input = this.context.device.importExternalTexture({source});
         } else {
@@ -83,6 +83,9 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
         this.layers[0].inputs[0] = this.context.input;
         this.layers[1].inputs[0] = this.context.input;
         this.layers[this.layers.length-1].inputs[3] = this.context.input
+
+        this.layers[0].lazyLoadSetup();
+        this.layers[this.layers.length-1].lazyLoadSetup();
 
 
         this.layers.forEach(function (layer) {

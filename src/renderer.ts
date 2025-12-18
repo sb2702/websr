@@ -65,7 +65,7 @@ export default class WebSRRenderer{
 
 
 
-    async render(source?: ImageBitmap){
+    async render(source?: MediaSource){
 
 
         const lastLayer = this.network.lastLayer();
@@ -74,7 +74,7 @@ export default class WebSRRenderer{
 
         await this.network.feedForward(source? source: this.source);
 
-        await this.context.device.queue.onSubmittedWorkDone();
+   
     }
 
 

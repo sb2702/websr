@@ -11,5 +11,5 @@ export default class WebSRRenderer {
     start(): Promise<void>;
     stop(): Promise<void>;
     renderStep(): Promise<void>;
-    render(source?: ImageBitmap): Promise<void>;
+    render(source?: MediaSource): Promise<void>;
 }

@@ -33,7 +33,7 @@ export default class WebGPUContext {
     scale: DisplayScale;
 
 
-    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement, scale: DisplayScale, debug?: boolean) {
+    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement , scale: DisplayScale, debug?: boolean) {
 
         this.device = device;
         this.canvas = canvas;
