@@ -11,6 +11,16 @@ A free and open-source Javascript library / SDK for running practical, real-time
 **Warning**
 This project is very new and still in development, and shouldn't be used (yet) in production until stable. Expect API changes between versions and bugs
 
+## Features
+
+- ✅ Real-time AI upscaling using WebGPU compute shaders
+- ✅ Multiple network sizes (Small, Medium, Large) for performance/quality tradeoffs
+- ✅ Pre-trained weights for Animation, Real Life, and 3D content
+- ✅ OffscreenCanvas support for worker thread processing
+- ✅ Custom training pipeline - train your own models
+- ✅ Manual render control for advanced use cases
+- ✅ Dynamic network switching at runtime
+
 
 ### Installation
 
@@ -67,9 +77,44 @@ If you want more control, you can manage the render cycle yourself. You can do t
     await websr.render(source); // ImageBitmap, HTML5VideoElement or HTML5Image element
 
 
-### Worker thread
+### OffscreenCanvas / Worker Thread
 
-Currently doesn't work in a worker thread. I'll fix it soon (though you're more than welcome to add a PR).
+WebSR is compatible with OffscreenCanvas, allowing you to run the upscaling in a worker thread to keep your main thread responsive:
+
+```javascript
+// main.js
+const canvas = document.getElementById('output');
+const offscreen = canvas.transferControlToOffscreen();
+const worker = new Worker('websr-worker.js');
+
+worker.postMessage({
+    canvas: offscreen,
+    videoWidth: 640,
+    videoHeight: 360
+}, [offscreen]);
+```
+
+```javascript
+// websr-worker.js
+importScripts('./websr.js');
+
+self.onmessage = async function(e) {
+    const { canvas, videoWidth, videoHeight } = e.data;
+
+    const gpu = await WebSR.initWebGPU();
+
+    const websr = new WebSR({
+        resolution: { width: videoWidth, height: videoHeight },
+        network_name: "anime4k/cnn-2x-s",
+        weights: await (await fetch('./cnn-2x-s.json')).json(),
+        gpu,
+        canvas: canvas
+    });
+
+    // Use manual render control in worker
+    // Process frames sent from main thread
+};
+```
 
 
 ### Network options
@@ -142,11 +187,33 @@ While there are many super-resolution networks and algorithms available, for a p
 2.  Already has GPU shader written in the similar `glsl` language
 3.  Already has wide community adoption.
 
-This repo provides the [default production weights](https://github.com/sb2702/websr/blob/main/weights/anime4k/cnn-2x-s.json) asociated with the `cnn-2x-s` network directly from Anime4K. 
-
-You can custom train or fine-tune the network and generate your own weights - see the notebooks in the `custom-training/` folder for details.
+This repo provides the [default production weights](https://github.com/sb2702/websr/blob/main/weights/anime4k/cnn-2x-s.json) asociated with the `cnn-2x-s` network directly from Anime4K.
 
 The plan is to add additional neural networks, whether from other open-source projects or building custom networks specifically for WebSR.
+
+### Custom Training
+
+You can train your own custom super-resolution models tailored to your specific content type or quality requirements. The `custom-training/` folder includes:
+
+- **Complete training pipeline** - Jupyter notebooks for training TensorFlow models
+- **Weight export tools** - Convert trained models to WebGPU format
+- **Training utilities** - Data augmentation, degradation simulation, and visualization
+- **Pre-configured architectures** - Small, Medium, and Large network options
+
+**Quick Start:**
+
+1. Prepare a dataset of high-quality images (500-1000+ images recommended)
+2. Train your model using `custom-training/Train_Model.ipynb`
+3. Export weights using `custom-training/Export_Weights.ipynb`
+4. Use your custom weights in WebSR (see Quick Start example above)
+
+For detailed instructions, see the [Custom Training README](./custom_training/README.md).
+
+**Use Cases for Custom Training:**
+- Content-specific optimization (e.g., medical imaging, satellite imagery)
+- Fine-tuning for specific art styles or game graphics
+- Balancing quality vs. performance for your target hardware
+- Training on proprietary content that differs from the provided weights
 
 ### Acknowledgements
 
@@ -156,12 +223,10 @@ The plan is to add additional neural networks, whether from other open-source pr
 
 ### Roadmap
 
-**Very soon**
-- [ ] Automated builds & tests
 
-**At some point**
 - [x] Add more upscaling networks (especially for other types of content - like real life, or screen-content)
 - [x] Dynamically switch between networks based on type of content
 - [x] Provide lower level controls (e.g. control over the render loop)
-- [ ] Do processing in Offscreen Canvas / worker thread
+- [x] OffscreenCanvas / worker thread support
+- [x] Custom training pipeline and documentation
 - [ ] Write Mobile SDKs with similar functionality
