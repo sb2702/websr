@@ -74,7 +74,7 @@ If you want more control, you can manage the render cycle yourself. You can do t
         canvas: //A canvas, with 2x the width and height of your input video
     });
 
-    await websr.render(source); // ImageBitmap, HTML5VideoElement or HTML5Image element
+    await websr.render(source); // ImageBitmap, VideoFrame, HTML5VideoElement or HTML5Image element
 
 
 ### OffscreenCanvas / Worker Thread

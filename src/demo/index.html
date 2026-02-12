@@ -72,15 +72,31 @@
         console.log(weights)
 
         const websr = new WebSR({
-            source:video,
+            resolution: {
+                width: video.videoWidth,
+                height: video.videoHeight
+            },
             network_name: "anime4k/cnn-2x-s",
             weights,
             gpu,
             canvas
         });
 
+        // Manual render loop using requestVideoFrameCallback
+        function renderFrame(now, metadata) {
+            // Render the current video frame
+            websr.render(video).then(() => {
+                // Request the next frame
+                video.requestVideoFrameCallback(renderFrame);
+            }).catch(err => {
+                console.error("Render error:", err);
+                // Continue the loop even on error
+                video.requestVideoFrameCallback(renderFrame);
+            });
+        }
 
-        await websr.start();
+        // Start the render loop
+        video.requestVideoFrameCallback(renderFrame);
 
     });
 
