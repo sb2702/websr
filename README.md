@@ -41,40 +41,33 @@ yarn add @websr/websr
 ### Quick Start
 
 ```javascript
-import WebSR from  '@websr/websr';
+import WebSR from '@websr/websr';
+
+const video = document.getElementById('video'); // HTML Video Element
+const canvas = document.getElementById('canvas'); // Output canvas
 
 const gpu = await WebSR.initWebGPU();
 
 if(!gpu) return console.log("Browser/device doesn't support WebGPU");
 
 const websr = new WebSR({
-    source: // An HTML Video Element
     network_name: "anime4k/cnn-2x-s",
-    weights: await (await fetch('./cnn-2x-s.json')).json() //found in weights/anime4k folder
+    weights: await (await fetch('./cnn-2x-s.json')).json(), //found in weights/anime4k folder
     gpu,
-    canvas: //A canvas, with 2x the width and height of your input video
+    canvas
 });
 
-await websr.start();   // Play the video
+// Render loop using requestVideoFrameCallback
+function renderFrame() {
+    websr.render(video).then(() => {
+        video.requestVideoFrameCallback(renderFrame);
+    });
+}
 
+video.requestVideoFrameCallback(renderFrame);
 ```
 
-### More control
-
-If you want more control, you can manage the render cycle yourself. You can do this the following way:
-
-    const websr = new WebSR({
-        resolution: {
-            width: 640,
-            height: 360
-        }
-        network_name: "anime4k/cnn-2x-s",
-        weights: await (await fetch('./cnn-2x-s.json')).json() //found in weights/anime4k folder
-        gpu,
-        canvas: //A canvas, with 2x the width and height of your input video
-    });
-
-    await websr.render(source); // ImageBitmap, VideoFrame, HTML5VideoElement or HTML5Image element
+**Note:** Resolution is automatically detected from the source on first render. The canvas will be automatically resized to match the upscaled output (input resolution × network scale factor). If the source resolution changes, WebSR will automatically reinitialize with the new dimensions.
 
 
 ### OffscreenCanvas / Worker Thread
@@ -86,33 +79,41 @@ WebSR is compatible with OffscreenCanvas, allowing you to run the upscaling in a
 const canvas = document.getElementById('output');
 const offscreen = canvas.transferControlToOffscreen();
 const worker = new Worker('websr-worker.js');
+const video = document.getElementById('video');
 
-worker.postMessage({
-    canvas: offscreen,
-    videoWidth: 640,
-    videoHeight: 360
-}, [offscreen]);
+// Send canvas and video frames to worker
+worker.postMessage({ canvas: offscreen }, [offscreen]);
+
+// Use requestVideoFrameCallback to send frames to worker
+function sendFrame() {
+    createImageBitmap(video).then(bitmap => {
+        worker.postMessage({ frame: bitmap }, [bitmap]);
+        video.requestVideoFrameCallback(sendFrame);
+    });
+}
+video.requestVideoFrameCallback(sendFrame);
 ```
 
 ```javascript
 // websr-worker.js
 importScripts('./websr.js');
 
+let websr;
+
 self.onmessage = async function(e) {
-    const { canvas, videoWidth, videoHeight } = e.data;
-
-    const gpu = await WebSR.initWebGPU();
-
-    const websr = new WebSR({
-        resolution: { width: videoWidth, height: videoHeight },
-        network_name: "anime4k/cnn-2x-s",
-        weights: await (await fetch('./cnn-2x-s.json')).json(),
-        gpu,
-        canvas: canvas
-    });
-
-    // Use manual render control in worker
-    // Process frames sent from main thread
+    if(e.data.canvas) {
+        // Initialize WebSR in worker
+        const gpu = await WebSR.initWebGPU();
+        websr = new WebSR({
+            network_name: "anime4k/cnn-2x-s",
+            weights: await (await fetch('./cnn-2x-s.json')).json(),
+            gpu,
+            canvas: e.data.canvas
+        });
+    } else if(e.data.frame && websr) {
+        // Render frame
+        await websr.render(e.data.frame);
+    }
 };
 ```
 

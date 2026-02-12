@@ -6,8 +6,7 @@ import {Resolution, MediaSource, getSourceWidth, getSourceHeight} from "./utils"
 
 
 interface WebSRParams {
-    source?: MediaSource,
-    canvas?: HTMLCanvasElement,
+    canvas: HTMLCanvasElement,
     weights: any,
     debug?: boolean;
     resolution?: Resolution,
@@ -23,58 +22,81 @@ declare global {
 
 export default class WebSR {
     canvas: HTMLCanvasElement;
-    context: WebGPUContext;
-    network: NeuralNetwork;
-    renderer: WebSRRenderer;
-    resolution: Resolution;
+    context?: WebGPUContext;
+    network?: NeuralNetwork;
+    renderer?: WebSRRenderer;
+    resolution?: Resolution;
     debug?: boolean;
-    source: MediaSource
     scale: DisplayScale;
+    private params: WebSRParams;
+    private initialized: boolean = false;
 
 
     constructor(params: WebSRParams) {
 
-
-
         if(!NetworkList[params.network_name]) throw Error(`Network ${params.network_name} is not defined or implemented`);
 
+        this.params = params;
+        this.canvas = params.canvas;
+        this.scale = NetworkScales[params.network_name];
+        this.debug = params.debug;
 
-        this.source = params.source;
+        // If resolution is provided, initialize immediately
+        if(params.resolution) {
+            this.resolution = params.resolution;
+            this.initialize();
+        }
+    }
 
-        const source = this.source;
-
-        this.resolution = params.resolution? params.resolution : {
-            width: getSourceWidth(source),
-            height: getSourceHeight(source)
+    private initialize() {
+        if(!this.resolution) {
+            throw new Error("Cannot initialize without resolution");
         }
 
-        const scale = NetworkScales[params.network_name];
+        // Resize canvas to match output resolution
+        this.canvas.width = this.resolution.width * this.scale;
+        this.canvas.height = this.resolution.height * this.scale;
 
-        if(params.canvas) this.canvas = params.canvas;
-        else  {
-            this.canvas = new HTMLCanvasElement();
-            this.canvas.width = this.resolution.width*scale;
-            this.canvas.height = this.resolution.height*scale;
-
-        }
-
-        this.scale = scale;
-
-        this.context = new WebGPUContext(params.gpu, this.resolution,  this.canvas, this.scale, this.debug);
-
+        // Create context
+        this.context = new WebGPUContext(this.params.gpu, this.resolution, this.canvas, this.scale, this.debug);
         globalThis.context = this.context;
 
-        this.network = new NetworkList[params.network_name](params.weights);
+        // Create network
+        this.network = new NetworkList[this.params.network_name](this.params.weights);
 
-        this.renderer = new WebSRRenderer(this.network, this.source);
+        // Create renderer
+        this.renderer = new WebSRRenderer(this.network);
 
+        this.initialized = true;
+    }
+
+    private updateResolution(newResolution: Resolution) {
+        // Check if resolution actually changed
+        if(this.resolution &&
+           this.resolution.width === newResolution.width &&
+           this.resolution.height === newResolution.height) {
+            return; // No change needed
+        }
+
+        console.log(`Resolution changed from ${this.resolution?.width}x${this.resolution?.height} to ${newResolution.width}x${newResolution.height}`);
+
+        this.resolution = newResolution;
+
+        // Clean up old resources if they exist
+        if(this.context) {
+            this.context.destroy();
+        }
+
+        // Re-initialize with new resolution
+        this.initialize();
     }
 
     switchNetwork(network: NetworkName, weights: any){
         if(!NetworkList[network]) throw Error(`Network ${network} is not defined or implemented`);
         this.network = new NetworkList[network](weights);
-        this.renderer.switchNetwork(this.network);
-
+        if(this.renderer) {
+            this.renderer.switchNetwork(this.network);
+        }
     }
 
     static async initWebGPU(): Promise<GPUDevice | false>{
@@ -93,21 +115,33 @@ export default class WebSR {
     }
 
 
-    async start (){
-        await this.renderer.start();
-    }
+    async render(source: MediaSource){
+        if(!source) {
+            throw new Error("render() requires a source parameter");
+        }
 
-    async stop(){
-        await this.renderer.stop();
-    }
+        // Detect resolution from source
+        const sourceResolution: Resolution = {
+            width: getSourceWidth(source),
+            height: getSourceHeight(source)
+        };
 
-    async render(source?: ImageBitmap){
-        await this.renderer.render(source);
+        // Initialize if not yet initialized, or update if resolution changed
+        if(!this.initialized) {
+            this.resolution = sourceResolution;
+            this.initialize();
+        } else if(sourceResolution.width !== this.resolution!.width ||
+                  sourceResolution.height !== this.resolution!.height) {
+            this.updateResolution(sourceResolution);
+        }
+
+        await this.renderer!.render(source);
     }
 
     async destroy(){
-        await this.renderer.stop();
-        this.context.destroy();
+        if(this.context) {
+            this.context.destroy();
+        }
     }
 
 

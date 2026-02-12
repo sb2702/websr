@@ -72,10 +72,6 @@
         console.log(weights)
 
         const websr = new WebSR({
-            resolution: {
-                width: video.videoWidth,
-                height: video.videoHeight
-            },
             network_name: "anime4k/cnn-2x-s",
             weights,
             gpu,

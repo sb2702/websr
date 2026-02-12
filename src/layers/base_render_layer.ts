@@ -12,6 +12,7 @@ class RenderLayer extends Layer {
     constructor(inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[], output:GPUTexture, weights?: any){
         super(inputs, output, weights);
         this.vertexScale = this.context.resolution;
+        this.createUniform('resolution', 'vec2f');
     }
 
 
@@ -19,11 +20,13 @@ class RenderLayer extends Layer {
     defaultVertexShader(){
 
         return `
-        
+
              struct VertexShaderOutput {
                 @builtin(position) position: vec4f,
                 @location(0) tex_coord: vec2f,
               };
+
+            @group(0) @binding(${this.inputs.length + this.uniforms.length}) var<uniform> resolution: vec2f;
 
             @vertex
             fn vertexMain( @builtin(vertex_index) vertexIndex : u32) ->  VertexShaderOutput{
@@ -32,20 +35,20 @@ class RenderLayer extends Layer {
                 vec2f( -1.0,  -1.0),  // center
                 vec2f( 1.0,  -1.0),  // right, center
                 vec2f( -1.0,  1.0),  // center, top
-             
+
                 // 2st triangle
                 vec2f( -1.0,  1.0),  // center, top
                 vec2f( 1.0,  -1.0),  // right, center
                 vec2f( 1.0,  1.0),  // right, top
               );
-             
+
               var vsOutput: VertexShaderOutput;
               let xy = pos[vertexIndex];
               vsOutput.position = vec4f(xy, 0.0, 1.0);
               vsOutput.tex_coord = xy*0.5 + 0.5;
               vsOutput.tex_coord.y = - 1.0* vsOutput.tex_coord.y  + 1.0;
-               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*${this.vertexScale.width};
-               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*${this.vertexScale.height};
+               vsOutput.tex_coord.x =  vsOutput.tex_coord.x*resolution.x;
+               vsOutput.tex_coord.y =  vsOutput.tex_coord.y*resolution.y;
               return vsOutput;
             }
         `
@@ -72,11 +75,18 @@ class RenderLayer extends Layer {
 
     defaultSetup(){
 
+        this.updateResolutionUniform();
+
         this.pipeline = this.device.createRenderPipeline(this.defaultPipelineConfig());
 
         this.bindGroup = this.defaultBindGroup();
 
         this.renderPassDescriptor = this.defaultRenderPassDescriptor();
+    }
+
+    updateResolutionUniform(){
+        const resolutionArray = new Float32Array([this.context.resolution.width, this.context.resolution.height]);
+        this.setUniform('resolution', resolutionArray);
     }
 
     defaultRenderPassDescriptor(): GPURenderPassDescriptor{
