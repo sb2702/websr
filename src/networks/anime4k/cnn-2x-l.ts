@@ -85,6 +85,7 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
         this.layers[this.layers.length-1].inputs[3] = this.context.input
 
         this.layers[0].lazyLoadSetup();
+        this.layers[1].lazyLoadSetup();
         this.layers[this.layers.length-1].lazyLoadSetup();
 
 
