@@ -218,7 +218,7 @@ For detailed instructions, see the [Custom Training README](./custom_training/RE
 
 ### Acknowledgements
 
-1. [Anime4K](https://github.com/bloc97/Anime4K) for an excellent project
+1. [Anime4K](https://github.com/bloc97/Anime4K) for an excellent project, first version of networks were direct ports of Anime4K, though the project no longer uses it 
 2. [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) for enabling compute-intensive projects like this
 3. [Blender foundation](https://studio.blender.org/films/hero/) for use of their hero movie in WebSR demos
 
