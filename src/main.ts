@@ -4,10 +4,12 @@ import NeuralNetwork from "./networks/base_network";
 import {NetworkList, NetworkName, NetworkScales, NetworkBufferCounts, NetworkBytesPerPixel, NetworkTilePadding, DisplayScale,
         NetworkMaxBufferBytesPerPixel, NetworkTileAlign} from "./networks/network_list";
 import {Resolution, MediaSource, getSourceWidth, getSourceHeight, GPUTier, getGPUTier} from "./utils";
+import {parseBinaryWeights, parseAnime4KWeights, parseX4VWeights, parseUNetWeights} from "./weights";
 
 export type {Precision} from './context';
 export type {Resolution, MediaSource, GPUTier} from './utils';
 export type {NetworkName} from './networks/network_list';
+export type {BinaryWeights, Anime4KWeights, UNetWeights} from './weights';
 
 
 export interface WebSRParams {
@@ -176,6 +178,13 @@ export default class WebSR {
         }
     }
 
+
+    // Binary weight parsers (see src/weights.ts). parseBinaryWeights handles every format
+    // (A4K, X4V, UNT) by its magic; the others parse one format each.
+    static parseBinaryWeights = parseBinaryWeights;
+    static parseAnime4KWeights = parseAnime4KWeights;
+    static parseX4VWeights = parseX4VWeights;
+    static parseUNetWeights = parseUNetWeights;
 
     static async initWebGPU(): Promise<GPUDevice | false>{
 
