@@ -12,39 +12,27 @@ export type ImageSource = HTMLImageElement | ImageBitmap;
 // All possible source types
 export type MediaSource = VideoSource | ImageSource;
 
+export function isHTMLVideoElement(source: any): source is HTMLVideoElement {
+    return typeof HTMLVideoElement !== 'undefined' && source instanceof HTMLVideoElement;
+}
+
+export function isHTMLImageElement(source: any): source is HTMLImageElement {
+    return typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement;
+}
+
+export function isImageBitmap(source: any): source is ImageBitmap {
+    return typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap;
+}
+
+export function isVideoFrame(source: any): source is VideoFrame {
+    return typeof VideoFrame !== 'undefined' && source instanceof VideoFrame;
+}
+
 /**
  * Check if we're running on the main thread (not in a worker)
  */
 export function isMainThread(): boolean {
     return typeof HTMLVideoElement !== 'undefined';
-}
-
-/**
- * Check if a source is a video element (main thread only)
- */
-export function isHTMLVideoElement(source: any): source is HTMLVideoElement {
-    return typeof HTMLVideoElement !== 'undefined' && source instanceof HTMLVideoElement;
-}
-
-/**
- * Check if a source is an image element (main thread only)
- */
-export function isHTMLImageElement(source: any): source is HTMLImageElement {
-    return typeof HTMLImageElement !== 'undefined' && source instanceof HTMLImageElement;
-}
-
-/**
- * Check if a source is an ImageBitmap (works in both contexts)
- */
-export function isImageBitmap(source: any): source is ImageBitmap {
-    return typeof ImageBitmap !== 'undefined' && source instanceof ImageBitmap;
-}
-
-/**
- * Check if a source is a VideoFrame (worker context)
- */
-export function isVideoFrame(source: any): source is VideoFrame {
-    return typeof VideoFrame !== 'undefined' && source instanceof VideoFrame;
 }
 
 /**
@@ -61,9 +49,6 @@ export function isImageSource(source: any): source is ImageSource {
     return isHTMLImageElement(source) || isImageBitmap(source);
 }
 
-/**
- * Get the width of a media source
- */
 export function getSourceWidth(source: MediaSource): number {
     if (isHTMLVideoElement(source)) return source.videoWidth;
     if (isHTMLImageElement(source)) return source.naturalWidth;
@@ -72,13 +57,54 @@ export function getSourceWidth(source: MediaSource): number {
     return 0;
 }
 
-/**
- * Get the height of a media source
- */
+export interface GPUTier {
+    tier: number,
+    isMobile: boolean,
+    type: string,
+    fps: number,
+    gpu: string
+}
+
+
+export function getGPUTier(tier?: GPUTier): number {
+
+    if(!tier) return 1;
+
+    let gpuTier = tier.tier;
+
+    if(!gpuTier) return 1;
+
+    if(tier.isMobile){
+        gpuTier = Math.max(gpuTier -1, 1);
+    }
+
+    return gpuTier;
+
+}
+
 export function getSourceHeight(source: MediaSource): number {
     if (isHTMLVideoElement(source)) return source.videoHeight;
     if (isHTMLImageElement(source)) return source.naturalHeight;
     if (isVideoFrame(source)) return source.displayHeight;
     if (isImageBitmap(source)) return source.height;
     return 0;
+}
+
+// Whether device.importExternalTexture works. Firefox ships WebGPU with external
+// textures behind a pref (NotSupportedError otherwise), so probe once per device,
+// with a real source, and fall back to ImageBitmap copies when it doesn't.
+const externalTextureSupport = new WeakMap<GPUDevice, boolean>();
+
+export function externalTexturesSupported(device: GPUDevice, source: VideoSource): boolean {
+    let ok = externalTextureSupport.get(device);
+    if (ok === undefined) {
+        try {
+            device.importExternalTexture({ source });
+            ok = true;
+        } catch (e) {
+            ok = false;
+        }
+        externalTextureSupport.set(device, ok);
+    }
+    return ok;
 }

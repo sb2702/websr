@@ -1,6 +1,9 @@
 import {Resolution} from "./utils";
 import {DisplayScale} from "./networks/network_list";
 
+// Compute precision for networks that support f16 (see WebGPUContext.useF16).
+export type Precision = 'auto' | 'f32' | 'f16';
+
 
 interface TextureOptions {
     width?: number,
@@ -24,20 +27,35 @@ export default class WebGPUContext {
     context: GPUCanvasContext;
     textures: Record<string, GPUTexture>;
     buffers: Record<string, GPUBuffer>;
-    resolution: Resolution;
+    processResolution: Resolution;
+    canvasResolution: Resolution;
+    outputResolution: Resolution;
     input: GPUTexture | GPUExternalTexture;
     destroyed: boolean;
     debug?: boolean;
     textureUsage: number;
     bufferUsage: number;
     scale: DisplayScale;
+    precision: Precision;
+
+    // Resolution each network pass runs at (one tile, including padding, when tiling).
+    // Kept as `resolution` for backwards compatibility with code written against <= 0.0.16.
+    get resolution(): Resolution {
+        return this.processResolution;
+    }
 
 
-    constructor(device: GPUDevice, resolution: Resolution, canvas: HTMLCanvasElement , scale: DisplayScale, debug?: boolean) {
+    constructor(device: GPUDevice, processResolution: Resolution, canvasResolution: Resolution, canvas: HTMLCanvasElement, scale: DisplayScale, debug?: boolean, outputResolution?: Resolution, precision?: Precision) {
 
         this.device = device;
+        this.precision = precision ?? 'auto';
         this.canvas = canvas;
-        this.resolution = resolution;
+        this.processResolution = processResolution;
+        this.canvasResolution = canvasResolution;
+        this.outputResolution = outputResolution ?? { width: canvasResolution.width * scale, height: canvasResolution.height * scale };
+
+
+
         this.textures = {};
         this.buffers = {};
         this.destroyed = false;
@@ -53,18 +71,23 @@ export default class WebGPUContext {
             throw  new Error("Unable to load WebGPU context");
         }
 
+
+
+        this.textureUsage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT |  GPUTextureUsage.COPY_SRC;
+        this.bufferUsage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+
+
         this.context.configure({
             device: this.device,
-            format: navigator.gpu.getPreferredCanvasFormat()
+            format: navigator.gpu.getPreferredCanvasFormat(),
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_DST
         });
 
 
-        this.textureUsage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT;
-        this.bufferUsage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
 
         if(this.debug) {
             // Read output pixel value
-            this.textureUsage  = this.textureUsage |  GPUTextureUsage.COPY_SRC;
+
             this.bufferUsage = this.bufferUsage | GPUBufferUsage.COPY_SRC
         }
         
@@ -124,6 +147,7 @@ export default class WebGPUContext {
         let bitsPerPixel = 16;
 
         if(texture.format === 'rgba8unorm') bitsPerPixel = 4;
+        if(texture.format === 'bgra8unorm') bitsPerPixel = 4;
         if(texture.format === 'r32float') bitsPerPixel = 4;
 
 
@@ -157,8 +181,23 @@ export default class WebGPUContext {
         if(texture.format === 'r32float') return  new Float32Array(resultBuffer.getMappedRange());
         else if(texture.format === 'rgba32float') return  new Float32Array(resultBuffer.getMappedRange());
         else if(texture.format === 'rgba8unorm') return new Uint8ClampedArray(resultBuffer.getMappedRange());
+        else if(texture.format === 'bgra8unorm') return new Uint8ClampedArray(resultBuffer.getMappedRange());
 
         return  new Float32Array(0);
+    }
+
+    cleanup(){
+        for(const key of Object.keys(this.buffers)){
+            this.buffers[key].destroy();
+            delete this.buffers[key]
+        }
+
+        for(const key of Object.keys(this.textures)){
+            this.textures[key].destroy();
+            delete this.textures[key]
+        }
+
+        
     }
 
     destroy(){
@@ -167,14 +206,27 @@ export default class WebGPUContext {
     }
 
 
+    // Resolve whether compute should run in f16. 'auto' picks f16 when the device
+    // exposes shader-f16 (requested in WebSR.initWebGPU) and the JS runtime has the
+    // native Float16Array used to pack f16 weights. Forcing 'f16' without support throws.
+    useF16(): boolean {
+        const hasF16 = !!this.device.features?.has('shader-f16') && typeof Float16Array !== 'undefined';
+        if (this.precision === 'f16') {
+            if (!hasF16) throw new Error("precision 'f16' requested but device lacks shader-f16 (or runtime lacks Float16Array)");
+            return true;
+        }
+        if (this.precision === 'f32') return false;
+        return hasF16;
+    }
+
     buffer(key: string, options?: BufferOptions): GPUBuffer{
 
         if(!this.buffers[key]){
 
             options = options || {};
 
-            const width = options.width || this.resolution.width;
-            const height = options.height || this.resolution.height;
+            const width = options.width || this.processResolution.width;
+            const height = options.height || this.processResolution.height;
             const channels = options.channels || 4;
             const bitdepth = options.bitdepth || 4;
 
@@ -201,7 +253,7 @@ export default class WebGPUContext {
 
             this.textures[key] = this.device.createTexture({
                 label: key,
-                size: [options.width || this.resolution.width, options.height || this.resolution.height],
+                size: [options.width || this.processResolution.width, options.height || this.processResolution.height],
                 format: options.format || 'rgba32float',
                 usage: this.textureUsage
             });

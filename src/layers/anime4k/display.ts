@@ -26,10 +26,17 @@ class DisplayLayer extends RenderLayer {
     }
 
 
+    private _builtForExternal: boolean | undefined;
+
     lazyLoadSetup(){
 
-
         const externalTexture = this.inputs[1] instanceof GPUExternalTexture;
+        if (this.pipeline && this._builtForExternal === externalTexture) {
+            // Same shader; the input texture itself may have changed, so rebind.
+            this.bindGroup = this.defaultBindGroup();
+            return;
+        }
+        this._builtForExternal = externalTexture;
 
         const textureLoad = externalTexture ? 'textureSampleBaseClampToEdge(inputTexture, ourSampler, input.tex_coord)' :
             'textureSample(inputTexture, ourSampler, input.tex_coord)';

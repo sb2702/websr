@@ -31,16 +31,16 @@ class Anime4KConv16x4 extends ComputeLayer {
                       
                  for(var i = 0u; i < 9; i++){
                    let pixel_loc = coord + vec2<i32>(kernel_offsets[i].xy);
-                   let buff_ind = pixel_loc.y*${this.resolution.width} + pixel_loc.x;
-                   
-                   let pix_val0 = inputBuffer0[buff_ind];
-                   let pix_val1 = inputBuffer1[buff_ind];
-                  
-                   result += kernels[i]*max(pix_val0, vec4f(0.0));
-                   result += kernels[i+9]*max(pix_val1, vec4f(0.0));
-                   result += kernels[i+18]*max(-1.0*pix_val0, vec4f(0.0));
-                   result += kernels[i+27]*max(-1.0*pix_val1, vec4f(0.0));
-                 } 
+                   if (pixel_loc.x >= 0 && pixel_loc.x < ${this.resolution.width} && pixel_loc.y >= 0 && pixel_loc.y < ${this.resolution.height}) {
+                     let buff_ind = pixel_loc.y*${this.resolution.width} + pixel_loc.x;
+                     let pix_val0 = inputBuffer0[buff_ind];
+                     let pix_val1 = inputBuffer1[buff_ind];
+                     result += kernels[i]*max(pix_val0, vec4f(0.0));
+                     result += kernels[i+9]*max(pix_val1, vec4f(0.0));
+                     result += kernels[i+18]*max(-1.0*pix_val0, vec4f(0.0));
+                     result += kernels[i+27]*max(-1.0*pix_val1, vec4f(0.0));
+                   }
+                 }
                  
 
                     

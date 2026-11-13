@@ -38,12 +38,19 @@ class Anime4KConv3x4 extends ComputeLayer {
 
     }
 
+    private _builtForExternal: boolean | undefined;
+
     lazyLoadSetup(){
-
-
-
-
         const externalTexture = this.inputs[0] instanceof GPUExternalTexture;
+        if (this.pipeline && this._builtForExternal === externalTexture) {
+           // Same shader; the input texture itself may have changed, so rebind.
+           this.bindGroup = this.defaultBindGroup();
+           return;
+        }
+        this._builtForExternal = externalTexture;
+    
+
+
 
         const textureLoad = externalTexture ? 'textureLoad(inputTexture0, coord + offset)' :
             'textureLoad(inputTexture0, coord + offset, 0)';
@@ -62,7 +69,7 @@ class Anime4KConv3x4 extends ComputeLayer {
                       
                  for(var i = 0u; i < 9; i++){
                    let offset = vec2<i32>(kernel_offsets[i].xy);
-                   result += kernels[i]*${textureLoad};
+                   result += kernels[i]*vec4f(${textureLoad});
                  } 
                     
                 result += bias;

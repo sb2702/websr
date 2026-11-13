@@ -7,7 +7,6 @@ import DisplayLayer3C from "../../layers/anime4k/display_3c";
 import Anime4KConv16x4 from "../../layers/anime4k/conv2d-16x4";
 import Anime4KConv112x4 from "../../layers/anime4k/conv2d-112x4";
 import Anime4KConcat2 from "../../layers/anime4k/conv2d-concat2";
-import {MediaSource, isHTMLVideoElement, isVideoFrame, isImageBitmap, getSourceWidth, getSourceHeight} from "../../utils";
 
 
 export default class Anime4KCNN2XL extends NeuralNetwork{
@@ -65,29 +64,9 @@ export default class Anime4KCNN2XL extends NeuralNetwork{
 
     }
 
-    async feedForward(source?: MediaSource){
+    async feedForward(input: GPUTexture | GPUExternalTexture, output: GPUTexture){
 
-
-        if(isHTMLVideoElement(source) || isVideoFrame(source)){
-
-            this.context.input = this.context.device.importExternalTexture({source});
-        } else {
-
-            const bitmap = isImageBitmap(source) ? source : await createImageBitmap(source);
-            const width = getSourceWidth(source);
-            const height = getSourceHeight(source);
-            this.context.device.queue.copyExternalImageToTexture({source: bitmap}, {texture:this.context.texture('input', {format: "rgba8unorm"})}, [width, height]);
-            this.context.input = this.context.texture('input');
-        }
-
-        this.layers[0].inputs[0] = this.context.input;
-        this.layers[1].inputs[0] = this.context.input;
-        this.layers[this.layers.length-1].inputs[3] = this.context.input
-
-        this.layers[0].lazyLoadSetup();
-        this.layers[1].lazyLoadSetup();
-        this.layers[this.layers.length-1].lazyLoadSetup();
-
+        this.bindInput(input, output, [[0, 0], [1, 0], [-1, 3]]);
 
         this.layers.forEach(function (layer) {
            layer.run();

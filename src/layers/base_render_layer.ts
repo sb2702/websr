@@ -11,7 +11,9 @@ class RenderLayer extends Layer {
 
     constructor(inputs: (GPUTexture|GPUExternalTexture|GPUBuffer)[], output:GPUTexture, weights?: any){
         super(inputs, output, weights);
-        this.vertexScale = this.context.resolution;
+        this.vertexScale = this.context.processResolution;
+
+
     }
 
 

@@ -27,7 +27,7 @@ class Layer {
 
         this.context = globalThis.context;
         this.device = this.context.device;
-        this.resolution = this.context.resolution;
+        this.resolution = this.context.processResolution;
         this.inputs = inputs;
         this.output = output;
         this.uniforms =  [];
