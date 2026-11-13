@@ -135,9 +135,9 @@ self.onmessage = async function(e) {
 | `websr/cnn-s` | 2× | Anime4K CNN-2x-L architecture (8 channels), WebSR-trained weights | `weights/websr/cnn-s.bin` |
 | `websr/cnn-m` | 2× | Same design widened to 16 channels | `weights/websr/cnn-m.bin` |
 | `websr/cnn-l` | 2× | Same design widened to 28 channels | `weights/websr/cnn-l.bin` |
-| `websr/gan-s` | 2× | UNet distilled from Real-ESRGAN x4v3 (24-48-96 channels). Real-life / detail content | hosted separately (17 MB) |
-| `websr/gan-m` | 2× | UNet distilled from Real-ESRGAN x4v3 (32-64-128 channels) | hosted separately (16 MB) |
-| `realesrgan/x4v3` | 4× | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) `realesr-general-x4v3` (SRVGGCompact, 34 convs, 64 channels). Heaviest | hosted separately (4.9 MB), or build it with `scripts/pth_to_bin.py` |
+| `websr/gan-s` | 2× | UNet distilled from Real-ESRGAN x4v3 (24-48-96 channels). Real-life / detail content | `weights/websr/gan-s.bin` (17 MB) |
+| `websr/gan-m` | 2× | UNet distilled from Real-ESRGAN x4v3 (32-64-128 channels) | `weights/websr/gan-m.bin` (16 MB) |
+| `realesrgan/x4v3` | 4× | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) `realesr-general-x4v3` (SRVGGCompact, 34 convs, 64 channels). Heaviest | `weights/realesrgan/x4v3.bin` (4.9 MB) |
 | `anime4k/cnn-2x-s` / `-m` / `-l` | 2× | [Anime4K](https://github.com/bloc97/Anime4K) upscalers, with Anime4K's original weights (`*-an.json`) or retrained Real Life (`*-rl`) / 3D (`*-3d`) weights | `weights/anime4k/*.json` |
 | `anime4k/cnn-restore-s` / `-m` / `-l` | 1× | Anime4K restore (denoise/sharpen, no upscaling) networks | `weights/anime4k/cnn-restore-*.json` |
 
@@ -145,10 +145,11 @@ self.onmessage = async function(e) {
 
 `websr/gan-*` and `realesrgan/x4v3` are larger networks aimed at real-life footage and need a reasonably capable GPU; the CNNs are cheap enough for real-time video on integrated graphics.
 
-**Loading binary weights.** `WebSR.parseBinaryWeights()` reads any of WebSR's binary formats (it detects the format from the file):
+**Loading weights.** The weights are in this repo (not in the npm package). Fetch them from jsDelivr's GitHub CDN, pinned to a release tag, e.g. `https://cdn.jsdelivr.net/gh/sb2702/websr@v0.1.0/weights/websr/cnn-m.bin` (mirror: `https://huggingface.co/katana-video/websr/resolve/main/weights/websr/cnn-m.bin`). [WEIGHTS.md](./WEIGHTS.md) lists every file with its sha256. `WebSR.parseBinaryWeights()` reads any of WebSR's binary formats (it detects the format from the file):
 
 ```javascript
-const buffer = await (await fetch('./cnn-m.bin')).arrayBuffer();
+const url = 'https://cdn.jsdelivr.net/gh/sb2702/websr@v0.1.0/weights/websr/cnn-m.bin';
+const buffer = await (await fetch(url)).arrayBuffer();
 
 const websr = new WebSR({
     network_name: "websr/cnn-m",
@@ -163,7 +164,7 @@ JSON weights (the `weights/anime4k` files) are passed as parsed JSON, as in the 
 **Per-video calibration (`websr/gan-*`).** The UNets have conditional bottleneck convolutions: several kernel "banks" per layer, blended once per video by a small gate network. Call `calibrate()` with a few representative frames; everything runs on the GPU and each later frame costs the same as a plain network:
 
 ```javascript
-const weights = WebSR.parseBinaryWeights(await (await fetch('./gan-s.bin')).arrayBuffer());
+const weights = WebSR.parseBinaryWeights(await (await fetch('https://cdn.jsdelivr.net/gh/sb2702/websr@v0.1.0/weights/websr/gan-s.bin')).arrayBuffer());
 const websr = new WebSR({ network_name: 'websr/gan-s', weights, gpu, canvas });
 
 await websr.calibrate(frames);   // optional, once per video: VideoFrame[] or ImageBitmap[]
