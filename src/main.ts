@@ -1,10 +1,12 @@
 import WebGPUContext, {Precision} from './context'
 import WebSRRenderer from "./renderer";
 import NeuralNetwork from "./networks/base_network";
-import {NetworkList, NetworkName, NetworkScales, NetworkBufferCounts, NetworkBytesPerPixel, NetworkTilePadding, DisplayScale,
-        NetworkMaxBufferBytesPerPixel, NetworkTileAlign} from "./networks/network_list";
+import {NetworkList, NetworkName, NetworkArchitecture, networkArchitecture, NetworkScales, NetworkBufferCounts, NetworkBytesPerPixel,
+        NetworkTilePadding, DisplayScale, NetworkMaxBufferBytesPerPixel, NetworkTileAlign} from "./networks/network_list";
 import {Resolution, MediaSource, getSourceWidth, getSourceHeight, GPUTier, getGPUTier} from "./utils";
-import {parseBinaryWeights, parseAnime4KWeights, parseX4VWeights, parseUNetWeights} from "./weights";
+import {parseBinaryWeights, parseAnime4KWeights, parseX4VWeights, parseUNetWeights, isUNetWeights} from "./weights";
+import UNetCNN from "./networks/unet/unet";
+import {computeThumbnails, runGate} from "./layers/unet/calibrate";
 
 export type {Precision} from './context';
 export type {Resolution, MediaSource, GPUTier} from './utils';
@@ -58,15 +60,20 @@ export default class WebSR {
     tier: number;
     private params: WebSRParams;
     private initialized: boolean = false;
+    // Per-video routing state for the conditional UNets (see calibrate()). Thumbnails are
+    // network-independent; alpha is per weights object.
+    private thumbs?: Float32Array;
+    private alphaCache = new WeakMap<object, Float32Array>();
+    private pendingCalibration?: Promise<void>;
 
 
     constructor(params: WebSRParams) {
 
-        if(!NetworkList[params.network_name]) throw Error(`Network ${params.network_name} is not defined or implemented`);
+        const arch = networkArchitecture(params.network_name);
 
         this.params = params;
         this.canvas = params.canvas;
-        this.scale = NetworkScales[params.network_name];
+        this.scale = NetworkScales[arch];
         this.debug = params.debug;
 
         this.tier = getGPUTier(params.tier);
@@ -116,8 +123,21 @@ export default class WebSR {
         this.context = new WebGPUContext(this.params.gpu, this.processResolution, this.canvasResolution, this.canvas as HTMLCanvasElement, this.scale, this.debug, outputResolution, this.params.precision);
         globalThis.context = this.context;
 
-        this.network = new NetworkList[this.params.network_name](this.params.weights);
-        this.renderer = new WebSRRenderer(this.network, this.nominalTileResolution, NetworkTilePadding[this.params.network_name]);
+        const arch = networkArchitecture(this.params.network_name);
+        this.network = new NetworkList[arch](this.params.weights);
+        this.renderer = new WebSRRenderer(this.network, this.nominalTileResolution, NetworkTilePadding[arch]);
+
+        // A conditional UNet starts on its training-average alpha; if calibrate() has run, apply
+        // the video's alpha (cached: synchronously, before any frame; else gate now, render awaits).
+        if (this.network instanceof UNetCNN && this.thumbs) {
+            const weights = this.params.weights;
+            const cached = this.alphaCache.get(weights);
+            if (cached) {
+                this.network.applyAlpha(cached);
+            } else {
+                this.pendingCalibration = this.network.calibrate(this.thumbs).then(a => { this.alphaCache.set(weights, a); });
+            }
+        }
 
         this.initialized = true;
     }
@@ -126,10 +146,10 @@ export default class WebSR {
     // Switch network (and weights). Networks differ in scale and buffer count, so the tile
     // plan and context are rebuilt. Safe to call before the first render().
     switchNetwork(network: NetworkName, weights: any){
-        if(!NetworkList[network]) throw Error(`Network ${network} is not defined or implemented`);
+        const arch = networkArchitecture(network);
 
         this.params = { ...this.params, network_name: network, weights };
-        this.scale = NetworkScales[network];
+        this.scale = NetworkScales[arch];
 
         if(this.canvasResolution) {
             this.setup(this.canvasResolution);
@@ -140,7 +160,7 @@ export default class WebSR {
     // padding, what the network runs at). Networks with NetworkTileAlign get tiles on that grid;
     // networks with NetworkMaxBufferBytesPerPixel get padded tiles under the per-buffer binding limit.
     private planTiles(W: number, H: number) {
-        const name = this.params.network_name;
+        const name = networkArchitecture(this.params.network_name);
         const pad = NetworkTilePadding[name];
         const align = NetworkTileAlign[name] ?? 1;
         const maxBuf = NetworkMaxBufferBytesPerPixel[name];
@@ -161,6 +181,32 @@ export default class WebSR {
             }
             budget = Math.floor(budget * 0.85);
         }
+    }
+
+    // Per-video routing for the conditional UNets (websr/gan-*): pass a few representative frames
+    // (e.g. non-black preview frames). Each is pooled to a 32x32 thumbnail on the GPU; the active
+    // UNet's gate turns them into the video's alpha, which is folded into its bottleneck weights,
+    // so every later frame runs the plain dense network. Thumbnails are kept, so a later
+    // switchNetwork() to another UNet re-gates them without needing the frames again (callers may
+    // close VideoFrames once this resolves). For other networks it only stores the thumbnails and
+    // returns null. Returns the active UNet's alpha, for logging. Optional: without it the UNets
+    // use their training-average alpha.
+    async calibrate(frames: (VideoFrame | ImageBitmap)[]): Promise<Float32Array | null> {
+        this.thumbs = await computeThumbnails(this.params.gpu, frames);
+        this.alphaCache = new WeakMap();
+        this.pendingCalibration = undefined;
+        const weights = this.params.weights;
+        if (!isUNetWeights(weights)) return null;
+        const alpha = this.network instanceof UNetCNN
+            ? await this.network.calibrate(this.thumbs)
+            : await runGate(this.params.gpu, weights, this.thumbs);     // applied in initialize()
+        this.alphaCache.set(weights, alpha);
+        return alpha;
+    }
+
+    // The stored 3x32x32 thumbnails (CHW per frame), for debugging / verification pages.
+    get calibrationThumbnails(): Float32Array | undefined {
+        return this.thumbs;
     }
 
     /** Change inputScale (see WebSRParams); the tile plan is redone on the next render(). */
@@ -208,7 +254,7 @@ export default class WebSR {
     // Compute max pixels a single tile can hold under two constraints:
     //   1) total memory budget (tier-dependent): sum of all buffers must fit
     //   2) per-buffer binding limit: no single buffer may exceed device.limits.maxStorageBufferBindingSize
-    private static computeMaxTilePixels(networkName: NetworkName, tier = 1, deviceMaxStorageBufferBindingSize = 128 * 1024 * 1024): number {
+    private static computeMaxTilePixels(networkName: NetworkArchitecture, tier = 1, deviceMaxStorageBufferBindingSize = 128 * 1024 * 1024): number {
         const bufferCount = NetworkBufferCounts[networkName];
         const bytesPerPixel = NetworkBytesPerPixel[networkName];
 
@@ -280,6 +326,11 @@ export default class WebSR {
                 console.log(`Resolution changed from ${this.canvasResolution?.width}x${this.canvasResolution?.height} to ${canvasResolution.width}x${canvasResolution.height}`);
             }
             this.setup(canvasResolution);
+        }
+
+        if (this.pendingCalibration) {
+            await this.pendingCalibration;
+            this.pendingCalibration = undefined;
         }
 
         await this.renderer!.render(source, onTileProgress);
