@@ -72,6 +72,8 @@ function renderFrame() {
 video.requestVideoFrameCallback(renderFrame);
 ```
 
+**No WebGPU?** [`@websr/webgl`](https://github.com/sb2702/websr-webgl) is a WebGL2 backend with the same API for `websr/cnn-s`, `websr/cnn-m` and `realesrgan/x4v3`. Use it as a fallback when `initWebGPU()` returns `false`.
+
 `render()` accepts an `HTMLVideoElement`, `VideoFrame`, `HTMLImageElement` or `ImageBitmap`.
 
 **Note:** Resolution is automatically detected from the source on first render. The canvas will be automatically resized to match the upscaled output (input resolution × network scale factor). If the source resolution changes, WebSR will automatically reinitialize with the new dimensions.
