@@ -115,10 +115,9 @@ class ComputeLayer extends Layer {
             pass.setBindGroup(0, this.bindGroup);
         }
 
-        // Dividing into work groups speeds up inference. If width or height aren't cleandly divided by work groups, we round to the nearest multiple of work-groups
-        // Physically, this means shaving a few pixels (up to num_work_groups-1) off the bottom and right edges of the canvas but users shouldn't notice?
-        
-        pass.dispatchWorkgroups(Math.floor(this.resolution.width/this.num_work_groups), Math.floor(this.resolution.height/this.num_work_groups));
+        // Round up so the last partial workgroup covers the right/bottom edge pixels. Every
+        // compute shader returns early for invocations outside its output resolution.
+        pass.dispatchWorkgroups(Math.ceil(this.resolution.width/this.num_work_groups), Math.ceil(this.resolution.height/this.num_work_groups));
 
         pass.end();
 

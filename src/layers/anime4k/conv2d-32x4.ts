@@ -20,6 +20,7 @@ class Anime4KConv32x4 extends ComputeLayer {
         this.shader = this.createStandardShader(`
         
           @compute @workgroup_size(${this.num_work_groups}, ${this.num_work_groups}) fn main( @builtin(global_invocation_id) id: vec3<u32>) {
+                if (id.x >= ${this.resolution.width}u || id.y >= ${this.resolution.height}u) { return; }
           
                 let x = id.x;
                 let y = id.y;
