@@ -6,6 +6,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     entry: [ "./src/main.ts"],
+    // Production mode: minified, and no eval() in the bundle (eval builds break under strict
+    // CSPs such as browser extensions'). Keep this the only `mode` key.
     mode: 'production',
     output: {
         library: "WebSR",
@@ -54,7 +56,5 @@ module.exports = {
         compress: true,
         port: 8000,
     },
-
-    mode: 'development'
 
 };

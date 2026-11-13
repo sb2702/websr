@@ -14,8 +14,13 @@ This project is very new and still in development, and shouldn't be used (yet) i
 ## Features
 
 - ✅ Real-time AI upscaling using WebGPU compute shaders
-- ✅ Multiple network sizes (Small, Medium, Large) for performance/quality tradeoffs
+- ✅ Multiple network sizes (XS to L) for performance/quality tradeoffs, plus Real-ESRGAN x4v3 and UNets distilled from it
 - ✅ Pre-trained weights for Animation, Real Life, and 3D content
+- ✅ Automatic tiling of large images/frames to stay within GPU memory limits, with per-tile progress
+- ✅ Input downscaling (`inputScale`) and arbitrary output sizes (`outputResolution`)
+- ✅ f16 compute on devices with `shader-f16`
+- ✅ Works without external textures (e.g. Firefox's WebGPU) by falling back to image copies
+- ✅ Compact binary weight formats
 - ✅ OffscreenCanvas support for worker thread processing
 - ✅ Custom training pipeline - train your own models
 - ✅ Manual render control for advanced use cases
@@ -66,6 +71,8 @@ function renderFrame() {
 
 video.requestVideoFrameCallback(renderFrame);
 ```
+
+`render()` accepts an `HTMLVideoElement`, `VideoFrame`, `HTMLImageElement` or `ImageBitmap`.
 
 **Note:** Resolution is automatically detected from the source on first render. The canvas will be automatically resized to match the upscaled output (input resolution × network scale factor). If the source resolution changes, WebSR will automatically reinitialize with the new dimensions.
 
@@ -118,11 +125,99 @@ self.onmessage = async function(e) {
 ```
 
 
-### Network options
+### Networks
 
-There are currently 3 networks defined:`anime4k/cnn-2x-s` (small), `anime4k/cnn-2x-m` (medium) and `anime4k/cnn-2x-l` (large). 
+`network_name` picks the architecture; the weights are passed separately (see [WEIGHTS.md](./WEIGHTS.md) for every file, its format and where to get it).
 
-For each network, I've not only included with the weights from Anime4K, but I've also retrained the networks on Real Life and 3D (gaming/3d animation) content. These can be found in the [weights/anime4k folder](https://github.com/sb2702/websr/tree/main/weights/anime4k)
+| Network | Scale | What it is | Weights |
+|---|---|---|---|
+| `websr/cnn-xs` | 2× | Tiny depthwise-separable CNN (~1.4k params), 16-channel CReLU trunk + bilinear residual. Fastest | `weights/websr/cnn-xs.bin` |
+| `websr/cnn-s` | 2× | Anime4K CNN-2x-L architecture (8 channels), WebSR-trained weights | `weights/websr/cnn-s.bin` |
+| `websr/cnn-m` | 2× | Same design widened to 16 channels | `weights/websr/cnn-m.bin` |
+| `websr/cnn-l` | 2× | Same design widened to 28 channels | `weights/websr/cnn-l.bin` |
+| `websr/gan-s` | 2× | UNet distilled from Real-ESRGAN x4v3 (24-48-96 channels). Real-life / detail content | hosted separately (17 MB) |
+| `websr/gan-m` | 2× | UNet distilled from Real-ESRGAN x4v3 (32-64-128 channels) | hosted separately (16 MB) |
+| `realesrgan/x4v3` | 4× | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) `realesr-general-x4v3` (SRVGGCompact, 34 convs, 64 channels). Heaviest | hosted separately (4.9 MB), or build it with `scripts/pth_to_bin.py` |
+| `anime4k/cnn-2x-s` / `-m` / `-l` | 2× | [Anime4K](https://github.com/bloc97/Anime4K) upscalers, with Anime4K's original weights (`*-an.json`) or retrained Real Life (`*-rl`) / 3D (`*-3d`) weights | `weights/anime4k/*.json` |
+| `anime4k/cnn-restore-s` / `-m` / `-l` | 1× | Anime4K restore (denoise/sharpen, no upscaling) networks | `weights/anime4k/cnn-restore-*.json` |
+
+`websr/cnn-s` and `anime4k/cnn-2x-l` are the same architecture: use `websr/cnn-s` with the WebSR-trained weights and `anime4k/cnn-2x-l` with Anime4K's original weights. The older names `sr2/cnn-2x-xs`, `anime4k/cnn-2x-16` and `anime4k/cnn-2x-28` still work as aliases of `websr/cnn-xs`, `websr/cnn-m` and `websr/cnn-l`.
+
+`websr/gan-*` and `realesrgan/x4v3` are larger networks aimed at real-life footage and need a reasonably capable GPU; the CNNs are cheap enough for real-time video on integrated graphics.
+
+**Loading binary weights.** `WebSR.parseBinaryWeights()` reads any of WebSR's binary formats (it detects the format from the file):
+
+```javascript
+const buffer = await (await fetch('./cnn-m.bin')).arrayBuffer();
+
+const websr = new WebSR({
+    network_name: "websr/cnn-m",
+    weights: WebSR.parseBinaryWeights(buffer),
+    gpu,
+    canvas
+});
+```
+
+JSON weights (the `weights/anime4k` files) are passed as parsed JSON, as in the Quick Start. `scripts/json_to_bin.py` converts JSON weights to the binary format.
+
+**Per-video calibration (`websr/gan-*`).** The UNets have conditional bottleneck convolutions: several kernel "banks" per layer, blended once per video by a small gate network. Call `calibrate()` with a few representative frames; everything runs on the GPU and each later frame costs the same as a plain network:
+
+```javascript
+const weights = WebSR.parseBinaryWeights(await (await fetch('./gan-s.bin')).arrayBuffer());
+const websr = new WebSR({ network_name: 'websr/gan-s', weights, gpu, canvas });
+
+await websr.calibrate(frames);   // optional, once per video: VideoFrame[] or ImageBitmap[]
+await websr.render(source);
+```
+
+Calibration is optional (without it the UNets use their training-average blend). The thumbnails are kept, so a later `switchNetwork()` to the other UNet re-applies it; you can close the `VideoFrame`s once `calibrate()` resolves. For other networks it just stores the thumbnails and returns `null`.
+
+
+### Options and methods
+
+#### `new WebSR(params)`
+
+| Option | Type | Required | Description |
+|---|---|---|---|
+| `canvas` | `HTMLCanvasElement \| OffscreenCanvas` | Yes | Output canvas. It is resized to the output resolution |
+| `gpu` | `GPUDevice` | Yes | From `WebSR.initWebGPU()` |
+| `network_name` | `string` | Yes | See [Networks](#networks) |
+| `weights` | `object` | Yes | Parsed JSON, or the result of `WebSR.parseBinaryWeights()` |
+| `resolution` | `{width, height}` | No | Source resolution, to set up in the constructor instead of on the first `render()` |
+| `outputResolution` | `{width, height}` | No | Canvas size. Defaults to input × network scale; other sizes are reached with a GPU bicubic resample of the network output |
+| `inputScale` | `number` | No | Resample the source by `1/inputScale` on the GPU (antialiased bicubic) before the network, e.g. `2` runs a 1080p source at 960×540. The output defaults to the resampled size × scale; pass `outputResolution` to keep the original output size |
+| `tier` | `{tier, isMobile}` | No | GPU capability tier (e.g. from [detect-gpu](https://github.com/pmndrs/detect-gpu)). Sizes the tile memory budget: tier 0 ≈ 50 MB, 1 ≈ 100 MB (default), 2 ≈ 250 MB, 3 ≈ 1 GB of network buffers per tile. Mobile devices drop one tier |
+| `precision` | `'auto' \| 'f32' \| 'f16'` | No | Compute precision for `realesrgan/x4v3` and `websr/gan-*`. `'auto'` (default) uses f16 when the device has `shader-f16` (which `WebSR.initWebGPU()` requests) |
+| `debug` | `boolean` | No | Debug mode (readable buffers) |
+
+#### Instance methods
+
+| Method | Description |
+|---|---|
+| `render(source, onTileProgress?)` | Upscale one frame/image to the canvas. If the source resolution changes, WebSR re-plans automatically. `onTileProgress(done, total)` fires as each tile finishes on the GPU (useful for large images) |
+| `switchNetwork(name, weights)` | Switch network at runtime (also before the first render) |
+| `setInputScale(k?)` | Change `inputScale`; applied on the next `render()` |
+| `setOutputResolution(res?)` | Change the output size; `undefined` restores the default |
+| `calibrate(frames)` | Per-video calibration for `websr/gan-*` (see above). Returns the blend weights, or `null` for other networks |
+| `destroy()` | Destroy the GPU device and release all resources |
+
+#### Static methods
+
+| Method | Description |
+|---|---|
+| `WebSR.initWebGPU()` | Returns a `GPUDevice` (with `shader-f16` when available), or `false` if WebGPU isn't supported |
+| `WebSR.parseBinaryWeights(buffer)` | Parse any binary weight file (A4K, X4V or UNT, detected from the file). `parseAnime4KWeights`, `parseX4VWeights` and `parseUNetWeights` parse one format each |
+
+#### Tiling
+
+Large inputs are split into tiles automatically so each network's buffers fit the GPU memory budget (see `tier`). Each tile is padded so that seams don't show, and the grid is chosen to minimise the number of tiles. You don't need to configure anything; pass `onTileProgress` to `render()` to show progress on big images.
+
+#### Browsers without external textures
+
+Where `GPUDevice.importExternalTexture` isn't available (e.g. Firefox's WebGPU at the time of writing), video sources are copied in as `ImageBitmap`s instead. This is detected once per device and needs no configuration.
+
+
+### Content detection
 
 For convenience, I've also included a [content detection style network](https://github.com/sb2702/websr/blob/main/weights/tflite/content_detection_mobilenet_v3.tflite) implemented in TFLite. You can use it as follows:
 
@@ -180,9 +275,9 @@ See [this video](https://www.youtube.com/watch?v=R6Ly0GYlXa4) for more info on s
 
 WebSR uses hand-written WebGPU shaders to implement Convolutional Neural Networks (like [this one](https://github.com/sb2702/websr/blob/main/src/networks/anime4k/cnn-2x-s.ts) from [Anime4K](https://github.com/bloc97/Anime4K)).
 
-When you create a `WebSR`instance and call `websr.start()`, that starts a render-loop which will take in video frames, one by one, and upscale them using the Neural Network, before painting the result to a `<canvas>`.
+Each call to `websr.render(source)` uploads the frame (or splits it into tiles), runs it through the Neural Network and paints the result to a `<canvas>`.
 
-While there are many super-resolution networks and algorithms available, for a proof of concept, WebSR implements networks from [Anime4K](https://github.com/bloc97/Anime4K) as 
+The first networks were ports of [Anime4K](https://github.com/bloc97/Anime4K), chosen because 
 
 1.  It was designed for real time video
 2.  Already has GPU shader written in the similar `glsl` language
@@ -190,7 +285,7 @@ While there are many super-resolution networks and algorithms available, for a p
 
 This repo provides the [default production weights](https://github.com/sb2702/websr/blob/main/weights/anime4k/cnn-2x-s.json) asociated with the `cnn-2x-s` network directly from Anime4K.
 
-The plan is to add additional neural networks, whether from other open-source projects or building custom networks specifically for WebSR.
+WebSR has since added its own networks (`websr/cnn-*`, `websr/gan-*`) and a port of [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN)'s `realesr-general-x4v3`.
 
 ### Custom Training
 
@@ -219,8 +314,9 @@ For detailed instructions, see the [Custom Training README](./custom_training/RE
 ### Acknowledgements
 
 1. [Anime4K](https://github.com/bloc97/Anime4K) for an excellent project, first version of networks were direct ports of Anime4K, though the project no longer uses it 
-2. [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) for enabling compute-intensive projects like this
-3. [Blender foundation](https://studio.blender.org/films/hero/) for use of their hero movie in WebSR demos
+2. [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) by Xintao Wang et al. (BSD-3-Clause): `realesrgan/x4v3` is a WebGPU port of `realesr-general-x4v3`, and the `websr/gan-*` UNets are distilled from it
+3. [WebGPU](https://developer.mozilla.org/en-US/docs/Web/API/WebGPU_API) for enabling compute-intensive projects like this
+4. [Blender foundation](https://studio.blender.org/films/hero/) for use of their hero movie in WebSR demos
 
 ### Roadmap
 
@@ -230,4 +326,6 @@ For detailed instructions, see the [Custom Training README](./custom_training/RE
 - [x] Provide lower level controls (e.g. control over the render loop)
 - [x] OffscreenCanvas / worker thread support
 - [x] Custom training pipeline and documentation
+- [x] Tiling, input/output resolution control, f16 compute
+- [x] Real-ESRGAN x4v3 port and distilled UNets
 - [ ] Write Mobile SDKs with similar functionality

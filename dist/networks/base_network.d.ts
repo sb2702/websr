@@ -1,6 +1,5 @@
 import WebGPUContext from "../context";
 import Layer from "../layers/base_layer";
-import { MediaSource } from "../utils";
 declare class NeuralNetwork {
     context: WebGPUContext;
     layers: Layer[];
@@ -8,6 +7,7 @@ declare class NeuralNetwork {
     constructor(weights?: any);
     model(): Layer[];
     lastLayer(): Layer;
-    feedForward(source?: MediaSource): Promise<void>;
+    protected bindInput(input: GPUTexture | GPUExternalTexture, output: GPUTexture, slots: [number, number][]): void;
+    feedForward(input: GPUTexture | GPUExternalTexture, output: GPUTexture): Promise<void>;
 }
 export default NeuralNetwork;
