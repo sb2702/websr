@@ -1,3 +1,5 @@
 node_modules
 .idea
 demo
+# Large weight files for local testing; hosted separately (see WEIGHTS.md)
+weights-local/
